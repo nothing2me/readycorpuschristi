@@ -29,7 +29,7 @@ ReadyCorpusChristi is a collaborative web application devloped by **3++**, a tea
 - **Disastery Plan Creation**: Export a printable PDF document for reference adding to the fridge. 
 
 ## Video Walkthrough
-[![](https://img.youtube.com/vi/FZ9KeVev494/maxresdefault.jpg)](https://www.youtube.com/watch?v=FZ9KeVev494)
+[![Watch the Demo Video](https://img.youtube.com/vi/FZ9KeVev494/hqdefault.jpg)](https://www.youtube.com/watch?v=FZ9KeVev494)
 
 
 ## Technologies Used
