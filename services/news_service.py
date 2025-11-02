@@ -93,7 +93,7 @@ class NewsService:
                 headline_text = link.get_text(strip=True) if link else tag.get_text(strip=True)
                 
                 # Clean headline: remove author names that are appended without spaces
-                 if headline_text:
+                if headline_text:
                     headline_text = self._clean_headline(headline_text).strip()
                 
                 # Get URL

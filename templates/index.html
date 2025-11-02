@@ -11,14 +11,19 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <!-- Logo in top right corner -->
+    <div class="top-right-logo">
+        <img src="{{ url_for('static', filename='CC.png') }}" alt="Corpus Christi Logo" class="site-logo">
+    </div>
+    
     <!-- Top Header Rectangle -->
     <div class="top-header-rectangle" id="top-header-rectangle">
         <div class="top-header-menu-content">
             <button class="top-header-toggle-btn" id="top-weather-toggle" data-toggle="weather">Weather</button>
             <button class="top-header-toggle-btn" id="top-traffic-toggle" data-toggle="traffic">Traffic</button>
             <button class="top-header-toggle-btn" id="top-evacuation-routes-toggle" data-toggle="evacuation-routes">Evacuation</button>
-            <button class="top-header-toggle-btn active" id="top-warnings-toggle" data-toggle="warnings">Warnings</button>
-            <button class="top-header-toggle-btn active" id="top-cameras-toggle" data-toggle="cameras">Cameras</button>
+            <button class="top-header-toggle-btn" id="top-warnings-toggle" data-toggle="warnings">Warnings</button>
+            <button class="top-header-toggle-btn" id="top-cameras-toggle" data-toggle="cameras">Cameras</button>
             <button class="top-header-toggle-btn active" id="top-flood-zones-toggle" data-toggle="flood-zones">Flood Zones</button>
             <div class="top-header-menu-item">
                 <div class="zone-selector-dropdown">
@@ -78,6 +83,9 @@
     <div id="safety-popup-modal" class="popup-modal">
         <div class="popup-content">
             <div class="popup-slide" id="slide-1">
+                <div class="popup-logo-container">
+                    <img src="{{ url_for('static', filename='CC.png') }}" alt="Corpus Christi Logo" class="popup-logo">
+                </div>
                 <div class="popup-header">
                     <h2>Test Your Disaster Readiness</h2>
                 </div>

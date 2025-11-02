@@ -46,10 +46,10 @@ class VisibilityMenu {
             this.evacuationRoutesToggle.checked = false;
         }
         if (this.warningsToggle) {
-            this.warningsToggle.checked = true; // Default to showing warnings
+            this.warningsToggle.checked = false; // Default to hiding warnings
         }
         if (this.camerasToggle) {
-            this.camerasToggle.checked = true; // Default to showing cameras
+            this.camerasToggle.checked = false; // Default to hiding cameras
         }
         if (this.floodZonesToggle) {
             this.floodZonesToggle.checked = true; // Default to showing flood zones
@@ -81,7 +81,7 @@ class VisibilityMenu {
             }
         }
         if (this.topWarningsToggle) {
-            const isActive = this.warningsToggle ? this.warningsToggle.checked : true;
+            const isActive = this.warningsToggle ? this.warningsToggle.checked : false;
             if (isActive) {
                 this.topWarningsToggle.classList.add('active');
             } else {
@@ -89,7 +89,7 @@ class VisibilityMenu {
             }
         }
         if (this.topCamerasToggle) {
-            const isActive = this.camerasToggle ? this.camerasToggle.checked : true;
+            const isActive = this.camerasToggle ? this.camerasToggle.checked : false;
             if (isActive) {
                 this.topCamerasToggle.classList.add('active');
             } else {

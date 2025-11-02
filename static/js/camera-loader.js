@@ -26,9 +26,15 @@ class CameraLoader {
                 
                 this.cameras = newCameras;
                 
-                if (camerasChanged) {
+                // Only display cameras if the toggle is active
+                const camerasToggle = document.getElementById('top-cameras-toggle');
+                const isCamerasActive = camerasToggle ? camerasToggle.classList.contains('active') : false;
+                
+                if (camerasChanged && isCamerasActive) {
                     console.log(`[Camera Loader] Cameras updated, refreshing map display`);
                     this.displayCameras();
+                } else if (!isCamerasActive) {
+                    console.log(`[Camera Loader] Cameras toggle is off, not displaying`);
                 } else {
                     console.log(`[Camera Loader] No camera changes detected`);
                 }
@@ -79,6 +85,14 @@ class CameraLoader {
     displayCameras() {
         if (!window.mapManager || !window.mapManager.map) {
             console.warn('Map manager not available, cannot display cameras');
+            return;
+        }
+
+        // Check if cameras toggle is active before displaying
+        const camerasToggle = document.getElementById('top-cameras-toggle');
+        const isCamerasActive = camerasToggle ? camerasToggle.classList.contains('active') : false;
+        if (!isCamerasActive) {
+            console.log('Cameras toggle is off, not displaying cameras');
             return;
         }
 

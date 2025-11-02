@@ -23,7 +23,12 @@ class WarningLoader {
                 if (this.warnings.length > 0) {
                     console.log('Sample warning:', this.warnings[0]);
                 }
-                this.displayWarnings();
+                // Only display warnings if the toggle is active
+                const warningsToggle = document.getElementById('top-warnings-toggle');
+                const isWarningsActive = warningsToggle ? warningsToggle.classList.contains('active') : false;
+                if (isWarningsActive) {
+                    this.displayWarnings();
+                }
             } else {
                 console.error('Failed to load warnings:', data.error);
             }
@@ -38,6 +43,14 @@ class WarningLoader {
     displayWarnings() {
         if (!window.mapManager || !window.mapManager.map) {
             console.warn('Map manager not available, cannot display warnings');
+            return;
+        }
+
+        // Check if warnings toggle is active before displaying
+        const warningsToggle = document.getElementById('top-warnings-toggle');
+        const isWarningsActive = warningsToggle ? warningsToggle.classList.contains('active') : false;
+        if (!isWarningsActive) {
+            console.log('Warnings toggle is off, not displaying warnings');
             return;
         }
 
