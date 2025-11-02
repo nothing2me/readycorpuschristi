@@ -93,7 +93,8 @@ class NewsService:
                 headline_text = link.get_text(strip=True) if link else tag.get_text(strip=True)
                 
                 # Clean headline: remove author names that are appended without spaces
-                headline_text = self._clean_headline(headline_text)
+                if headline_text:
+                    headline_text = self._clean_headline(headline_text).strip()
                 
                 # Get URL
                 href = link.get('href', '') if link else ''
@@ -108,11 +109,11 @@ class NewsService:
                 else:
                     url = f"{self.news_url}/{href}"
                 
-                # Validate headline
-                if not headline_text or len(headline_text) < 15:
+                # Validate headline after cleaning
+                if not headline_text or len(headline_text) < 10:
                     continue
                 
-                # Skip duplicates
+                # Skip duplicates using cleaned headline
                 headline_lower = headline_text.lower()
                 if headline_lower in seen_headlines or url in seen_urls:
                     continue
@@ -163,11 +164,13 @@ class NewsService:
                         headline_text = link.get_text(strip=True)
                         
                         # Clean headline: remove author names that are appended without spaces
-                        headline_text = self._clean_headline(headline_text)
+                        if headline_text:
+                            headline_text = self._clean_headline(headline_text).strip()
                         
                         href = link.get('href', '')
                         
-                        if not href or not headline_text or len(headline_text) < 15:
+                        # Validate headline after cleaning
+                        if not href or not headline_text or len(headline_text) < 10:
                             continue
                         
                         # Make absolute URL
@@ -178,7 +181,7 @@ class NewsService:
                         else:
                             continue
                         
-                        # Skip duplicates
+                        # Skip duplicates using cleaned headline
                         headline_lower = headline_text.lower()
                         if headline_lower in seen_headlines or url in seen_urls:
                             continue

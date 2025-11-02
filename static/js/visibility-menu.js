@@ -7,15 +7,29 @@ class VisibilityMenu {
     constructor() {
         this.menuToggleBtn = document.getElementById('menu-toggle-btn');
         this.menuDropdown = document.getElementById('menu-dropdown');
+        
+        // Original menu toggles
         this.weatherToggle = document.getElementById('weather-toggle');
-        this.weatherWindow = document.getElementById('weather-window');
-        this.weatherCloseBtn = document.getElementById('weather-close-btn');
-        this.weatherContent = document.getElementById('weather-content');
         this.trafficToggle = document.getElementById('traffic-toggle');
         this.evacuationRoutesToggle = document.getElementById('evacuation-routes-toggle');
         this.warningsToggle = document.getElementById('warnings-toggle');
         this.camerasToggle = document.getElementById('cameras-toggle');
         this.floodZonesToggle = document.getElementById('flood-zones-toggle');
+        
+        // Top header toggles
+        this.topWeatherToggle = document.getElementById('top-weather-toggle');
+        this.topTrafficToggle = document.getElementById('top-traffic-toggle');
+        this.topEvacuationRoutesToggle = document.getElementById('top-evacuation-routes-toggle');
+        this.topWarningsToggle = document.getElementById('top-warnings-toggle');
+        this.topCamerasToggle = document.getElementById('top-cameras-toggle');
+        this.topFloodZonesToggle = document.getElementById('top-flood-zones-toggle');
+        this.topZoneSelectorToggle = document.getElementById('top-zone-selector-toggle');
+        this.topZoneSelectorDropdown = document.getElementById('top-zone-selector-dropdown');
+        this.topOpenHotelSearchBtn = document.getElementById('top-open-hotel-search-btn');
+        
+        this.weatherWindow = document.getElementById('weather-window');
+        this.weatherCloseBtn = document.getElementById('weather-close-btn');
+        this.weatherContent = document.getElementById('weather-content');
         
         this.init();
     }
@@ -39,6 +53,56 @@ class VisibilityMenu {
         }
         if (this.floodZonesToggle) {
             this.floodZonesToggle.checked = true; // Default to showing flood zones
+        }
+        
+        // Sync top header toggle buttons with original toggles (set active class)
+        if (this.topWeatherToggle) {
+            const isActive = this.weatherToggle ? this.weatherToggle.checked : false;
+            if (isActive) {
+                this.topWeatherToggle.classList.add('active');
+            } else {
+                this.topWeatherToggle.classList.remove('active');
+            }
+        }
+        if (this.topTrafficToggle) {
+            const isActive = this.trafficToggle ? this.trafficToggle.checked : false;
+            if (isActive) {
+                this.topTrafficToggle.classList.add('active');
+            } else {
+                this.topTrafficToggle.classList.remove('active');
+            }
+        }
+        if (this.topEvacuationRoutesToggle) {
+            const isActive = this.evacuationRoutesToggle ? this.evacuationRoutesToggle.checked : false;
+            if (isActive) {
+                this.topEvacuationRoutesToggle.classList.add('active');
+            } else {
+                this.topEvacuationRoutesToggle.classList.remove('active');
+            }
+        }
+        if (this.topWarningsToggle) {
+            const isActive = this.warningsToggle ? this.warningsToggle.checked : true;
+            if (isActive) {
+                this.topWarningsToggle.classList.add('active');
+            } else {
+                this.topWarningsToggle.classList.remove('active');
+            }
+        }
+        if (this.topCamerasToggle) {
+            const isActive = this.camerasToggle ? this.camerasToggle.checked : true;
+            if (isActive) {
+                this.topCamerasToggle.classList.add('active');
+            } else {
+                this.topCamerasToggle.classList.remove('active');
+            }
+        }
+        if (this.topFloodZonesToggle) {
+            const isActive = this.floodZonesToggle ? this.floodZonesToggle.checked : true;
+            if (isActive) {
+                this.topFloodZonesToggle.classList.add('active');
+            } else {
+                this.topFloodZonesToggle.classList.remove('active');
+            }
         }
         
         // Menu toggle button
@@ -103,17 +167,256 @@ class VisibilityMenu {
         // Flood zones toggle
         if (this.floodZonesToggle) {
             this.floodZonesToggle.addEventListener('change', () => {
+                this.syncFloodZonesToggle();
                 this.toggleFloodZones();
             });
+        }
+        
+        // Top header toggle buttons - handle clicks
+        if (this.topWeatherToggle) {
+            this.topWeatherToggle.addEventListener('click', () => {
+                this.topWeatherToggle.classList.toggle('active');
+                if (this.weatherToggle) {
+                    this.weatherToggle.checked = this.topWeatherToggle.classList.contains('active');
+                }
+                this.toggleWeatherWindow();
+            });
+        }
+        
+        if (this.topTrafficToggle) {
+            this.topTrafficToggle.addEventListener('click', () => {
+                this.topTrafficToggle.classList.toggle('active');
+                if (this.trafficToggle) {
+                    this.trafficToggle.checked = this.topTrafficToggle.classList.contains('active');
+                }
+                this.toggleTrafficLayer();
+            });
+        }
+        
+        if (this.topEvacuationRoutesToggle) {
+            this.topEvacuationRoutesToggle.addEventListener('click', () => {
+                this.topEvacuationRoutesToggle.classList.toggle('active');
+                if (this.evacuationRoutesToggle) {
+                    this.evacuationRoutesToggle.checked = this.topEvacuationRoutesToggle.classList.contains('active');
+                }
+                this.toggleEvacuationRoutes();
+            });
+        }
+        
+        if (this.topWarningsToggle) {
+            this.topWarningsToggle.addEventListener('click', () => {
+                this.topWarningsToggle.classList.toggle('active');
+                if (this.warningsToggle) {
+                    this.warningsToggle.checked = this.topWarningsToggle.classList.contains('active');
+                }
+                this.toggleWarnings();
+            });
+        }
+        
+        if (this.topCamerasToggle) {
+            this.topCamerasToggle.addEventListener('click', () => {
+                this.topCamerasToggle.classList.toggle('active');
+                if (this.camerasToggle) {
+                    this.camerasToggle.checked = this.topCamerasToggle.classList.contains('active');
+                }
+                this.toggleCameras();
+            });
+        }
+        
+        if (this.topFloodZonesToggle) {
+            this.topFloodZonesToggle.addEventListener('click', () => {
+                this.topFloodZonesToggle.classList.toggle('active');
+                if (this.floodZonesToggle) {
+                    this.floodZonesToggle.checked = this.topFloodZonesToggle.classList.contains('active');
+                }
+                this.toggleFloodZones();
+            });
+        }
+        
+        // Sync original toggles to top header toggle buttons
+        if (this.weatherToggle) {
+            this.weatherToggle.addEventListener('change', () => {
+                if (this.topWeatherToggle) {
+                    if (this.weatherToggle.checked) {
+                        this.topWeatherToggle.classList.add('active');
+                    } else {
+                        this.topWeatherToggle.classList.remove('active');
+                    }
+                }
+            });
+        }
+        
+        if (this.trafficToggle) {
+            this.trafficToggle.addEventListener('change', () => {
+                if (this.topTrafficToggle) {
+                    if (this.trafficToggle.checked) {
+                        this.topTrafficToggle.classList.add('active');
+                    } else {
+                        this.topTrafficToggle.classList.remove('active');
+                    }
+                }
+            });
+        }
+        
+        if (this.evacuationRoutesToggle) {
+            this.evacuationRoutesToggle.addEventListener('change', () => {
+                if (this.topEvacuationRoutesToggle) {
+                    if (this.evacuationRoutesToggle.checked) {
+                        this.topEvacuationRoutesToggle.classList.add('active');
+                    } else {
+                        this.topEvacuationRoutesToggle.classList.remove('active');
+                    }
+                }
+            });
+        }
+        
+        if (this.warningsToggle) {
+            this.warningsToggle.addEventListener('change', () => {
+                if (this.topWarningsToggle) {
+                    if (this.warningsToggle.checked) {
+                        this.topWarningsToggle.classList.add('active');
+                    } else {
+                        this.topWarningsToggle.classList.remove('active');
+                    }
+                }
+            });
+        }
+        
+        if (this.camerasToggle) {
+            this.camerasToggle.addEventListener('change', () => {
+                if (this.topCamerasToggle) {
+                    if (this.camerasToggle.checked) {
+                        this.topCamerasToggle.classList.add('active');
+                    } else {
+                        this.topCamerasToggle.classList.remove('active');
+                    }
+                }
+            });
+        }
+        
+        if (this.floodZonesToggle) {
+            this.floodZonesToggle.addEventListener('change', () => {
+                if (this.topFloodZonesToggle) {
+                    if (this.floodZonesToggle.checked) {
+                        this.topFloodZonesToggle.classList.add('active');
+                    } else {
+                        this.topFloodZonesToggle.classList.remove('active');
+                    }
+                }
+            });
+        }
+        
+        // Top header zone selector dropdown
+        if (this.topZoneSelectorToggle) {
+            this.topZoneSelectorToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (this.topZoneSelectorDropdown) {
+                    this.topZoneSelectorDropdown.classList.toggle('active');
+                    
+                    // Rotate arrow
+                    const arrow = this.topZoneSelectorToggle.querySelector('.dropdown-arrow');
+                    if (arrow) {
+                        if (this.topZoneSelectorDropdown.classList.contains('active')) {
+                            arrow.textContent = '▲';
+                        } else {
+                            arrow.textContent = '▼';
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Close top zone dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (this.topZoneSelectorDropdown && 
+                !this.topZoneSelectorToggle.contains(e.target) && 
+                !this.topZoneSelectorDropdown.contains(e.target)) {
+                this.topZoneSelectorDropdown.classList.remove('active');
+            }
+        });
+        
+        // Sync top zone checkboxes with main zone checkboxes
+        const topZoneCheckboxes = document.querySelectorAll('.top-zone-checkbox');
+        const mainZoneCheckboxes = document.querySelectorAll('.zone-checkbox:not(.top-zone-checkbox)');
+        
+        topZoneCheckboxes.forEach((topCheckbox) => {
+            topCheckbox.addEventListener('change', async (e) => {
+                e.stopPropagation();
+                const zoneId = parseInt(topCheckbox.getAttribute('data-zone-id'));
+                const isChecked = topCheckbox.checked;
+                
+                // Wait for floodZoneManager to be available if not yet initialized
+                if (window.floodZoneManager) {
+                    await window.floodZoneManager.toggleZone(zoneId, isChecked);
+                } else {
+                    // Wait a bit for floodZoneManager to initialize
+                    const checkInterval = setInterval(() => {
+                        if (window.floodZoneManager) {
+                            clearInterval(checkInterval);
+                            window.floodZoneManager.toggleZone(zoneId, isChecked);
+                        }
+                    }, 100);
+                    
+                    // Stop checking after 5 seconds
+                    setTimeout(() => clearInterval(checkInterval), 5000);
+                }
+                
+                // Sync with main checkboxes
+                mainZoneCheckboxes.forEach(mainCheckbox => {
+                    if (parseInt(mainCheckbox.getAttribute('data-zone-id')) === zoneId) {
+                        mainCheckbox.checked = topCheckbox.checked;
+                    }
+                });
+            });
+        });
+        
+        // Sync main zone checkboxes to top zone checkboxes
+        mainZoneCheckboxes.forEach(mainCheckbox => {
+            mainCheckbox.addEventListener('change', () => {
+                const zoneId = parseInt(mainCheckbox.getAttribute('data-zone-id'));
+                topZoneCheckboxes.forEach(topCheckbox => {
+                    if (parseInt(topCheckbox.getAttribute('data-zone-id')) === zoneId) {
+                        topCheckbox.checked = mainCheckbox.checked;
+                    }
+                });
+            });
+        });
+        
+        // Top header hotel search button
+        if (this.topOpenHotelSearchBtn) {
+            this.topOpenHotelSearchBtn.addEventListener('click', () => {
+                // Try to find the original button first
+                const hotelSearchBtn = document.getElementById('open-hotel-search-btn');
+                if (hotelSearchBtn) {
+                    hotelSearchBtn.click();
+                } else if (window.hotelSearchManager && typeof window.hotelSearchManager.openModal === 'function') {
+                    // Directly call the hotel search manager's openModal method
+                    window.hotelSearchManager.openModal();
+                } else {
+                    console.error('Hotel search manager not available');
+                }
+            });
+        }
+    }
+    
+    syncFloodZonesToggle() {
+        // Sync top header toggle with main toggle (if main toggle exists)
+        if (this.floodZonesToggle && this.topFloodZonesToggle) {
+            this.topFloodZonesToggle.checked = this.floodZonesToggle.checked;
         }
     }
 
     toggleMenu() {
-        this.menuDropdown.classList.toggle('active');
+        // Menu dropdown no longer exists - this function is kept for compatibility
+        if (this.menuDropdown) {
+            this.menuDropdown.classList.toggle('active');
+        }
     }
 
     toggleWeatherWindow() {
-        if (this.weatherToggle.checked) {
+        const isChecked = this.topWeatherToggle ? this.topWeatherToggle.classList.contains('active') : 
+                         (this.weatherToggle ? this.weatherToggle.checked : false);
+        if (isChecked) {
             this.showWeatherWindow();
         } else {
             this.hideWeatherWindow();
@@ -130,6 +433,9 @@ class VisibilityMenu {
     hideWeatherWindow() {
         if (this.weatherWindow) {
             this.weatherWindow.style.display = 'none';
+        }
+        if (this.topWeatherToggle) {
+            this.topWeatherToggle.classList.remove('active');
         }
         if (this.weatherToggle) {
             this.weatherToggle.checked = false;
@@ -376,7 +682,9 @@ class VisibilityMenu {
             return;
         }
 
-        if (this.trafficToggle.checked) {
+        const isChecked = this.topTrafficToggle ? this.topTrafficToggle.classList.contains('active') : 
+                         (this.trafficToggle ? this.trafficToggle.checked : false);
+        if (isChecked) {
             window.trafficLayerManager.enableTrafficLayer();
         } else {
             window.trafficLayerManager.disableTrafficLayer();
@@ -389,7 +697,9 @@ class VisibilityMenu {
             return;
         }
 
-        if (this.evacuationRoutesToggle.checked) {
+        const isChecked = this.topEvacuationRoutesToggle ? this.topEvacuationRoutesToggle.classList.contains('active') : 
+                         (this.evacuationRoutesToggle ? this.evacuationRoutesToggle.checked : false);
+        if (isChecked) {
             window.evacuationRoutesManager.enableRoutes();
         } else {
             window.evacuationRoutesManager.disableRoutes();
@@ -402,7 +712,9 @@ class VisibilityMenu {
             return;
         }
 
-        if (this.warningsToggle.checked) {
+        const isChecked = this.topWarningsToggle ? this.topWarningsToggle.classList.contains('active') : 
+                         (this.warningsToggle ? this.warningsToggle.checked : false);
+        if (isChecked) {
             // Show warnings - re-display them if warning loader exists
             if (window.warningLoader && window.warningLoader.warnings) {
                 window.warningLoader.displayWarnings();
@@ -424,7 +736,9 @@ class VisibilityMenu {
             return;
         }
 
-        if (this.camerasToggle.checked) {
+        const isChecked = this.topCamerasToggle ? this.topCamerasToggle.classList.contains('active') : 
+                         (this.camerasToggle ? this.camerasToggle.checked : false);
+        if (isChecked) {
             // Show cameras - re-display them if camera loader exists
             if (window.cameraLoader && window.cameraLoader.cameras) {
                 window.cameraLoader.displayCameras();
@@ -446,7 +760,9 @@ class VisibilityMenu {
             return;
         }
 
-        if (this.floodZonesToggle.checked) {
+        const isChecked = this.topFloodZonesToggle ? this.topFloodZonesToggle.classList.contains('active') : 
+                         (this.floodZonesToggle ? this.floodZonesToggle.checked : false);
+        if (isChecked) {
             // Show flood zones - use displayZones which respects individual checkboxes
             window.floodZoneManager.displayZones();
             

@@ -29,17 +29,21 @@ class SafetyEvaluationTemplate:
         # Calculate statistics
         total_questions = len(questions)
         answered_count = len(answers)
-        yes_count = sum(1 for ans in answers.values() if isinstance(ans, str) and ans == 'yes')
+        # Count yes answers (including those with details like "yes: details")
+        yes_count = sum(1 for ans in answers.values() if isinstance(ans, str) and (ans == 'yes' or ans.startswith('yes: ')))
         no_count = sum(1 for ans in answers.values() if isinstance(ans, str) and ans == 'no')
-        text_entries_count = sum(1 for ans in answers.values() if isinstance(ans, str) and ans not in ['yes', 'no', 'not answered'])
+        # Count text entries (answers with details)
+        text_entries_count = sum(1 for ans in answers.values() if isinstance(ans, str) and ans.startswith('yes: '))
         not_answered_count = total_questions - answered_count
         
         # Calculate preparedness score (1-10)
-        # Score based on: yes answers = +1 point each, no answers = 0 points, text entries = partial credit (0.5)
+        # Score based on: yes answers = +1 point each, yes with details = +1 point, no answers = 0 points
         score = 0
         max_score = total_questions
         if answered_count > 0:
-            score = (yes_count * 1.0) + (text_entries_count * 0.5)
+            # Yes answers count as 1 point (including those with details)
+            # Details don't add extra points, they just provide more information
+            score = yes_count * 1.0
             # Normalize to 1-10 scale: (score / max_score) * 9 + 1 to ensure range is 1-10
             # This maps: 0% -> 1, 50% -> 5.5, 100% -> 10
             normalized_score = max(1, min(10, round((score / max_score) * 9 + 1)))
@@ -53,11 +57,18 @@ class SafetyEvaluationTemplate:
         
         for idx, question in enumerate(questions, start=1):
             answer = answers.get(idx, 'not answered')
-            if answer == 'yes':
+            # Handle format "yes: details" where details are provided after "yes:"
+            if isinstance(answer, str) and answer.startswith('yes: '):
+                # Answer with details
+                details = answer[5:]  # Remove "yes: " prefix
+                strengths.append(f"Question {idx}: {question}")
+                text_responses.append(f"Question {idx}: {question}\n   Details: {details}")
+            elif answer == 'yes':
                 strengths.append(f"Question {idx}: {question}")
             elif answer == 'no':
                 areas_concern.append(f"Question {idx}: {question}")
             elif isinstance(answer, str) and answer not in ['yes', 'no', 'not answered']:
+                # This is a text response with details (legacy format)
                 text_responses.append(f"Question {idx}: {question}\n   Response: {answer}")
         
         # Build concise prompt with scoring
@@ -165,15 +176,18 @@ class SafetyEvaluationTemplate:
         questions = evaluation_data.get('questions', [])
         
         total_questions = len(questions)
-        yes_count = sum(1 for ans in answers.values() if isinstance(ans, str) and ans == 'yes')
+        # Count yes answers (including those with details like "yes: details")
+        yes_count = sum(1 for ans in answers.values() if isinstance(ans, str) and (ans == 'yes' or ans.startswith('yes: ')))
         no_count = sum(1 for ans in answers.values() if isinstance(ans, str) and ans == 'no')
-        text_entries_count = sum(1 for ans in answers.values() if isinstance(ans, str) and ans not in ['yes', 'no', 'not answered'])
+        # Count text entries (answers with details - these are yes answers with details)
+        text_entries_count = sum(1 for ans in answers.values() if isinstance(ans, str) and ans.startswith('yes: '))
         answered_count = len(answers)
         
         # Calculate preparedness score (1-10)
         max_score = total_questions
         if answered_count > 0:
-            score = (yes_count * 1.0) + (text_entries_count * 0.5)
+            # Yes answers count as 1 point (including those with details)
+            score = yes_count * 1.0
             # Normalize to 1-10 scale: (score / max_score) * 9 + 1 to ensure range is 1-10
             normalized_score = max(1, min(10, round((score / max_score) * 9 + 1)))
         else:

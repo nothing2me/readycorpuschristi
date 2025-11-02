@@ -1,0 +1,20 @@
+* [33meb8adb3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/master[m[33m)[m Initial commit: ReadyCorpusChristi disaster preparedness application
+* [33m3cbc85d[m[33m ([m[1;31morigin/main[m[33m)[m Clean up README by removing commented config options
+* [33m183c641[m Update geocoding provider instructions in README
+* [33m7d6c526[m Delete cameras_data.json
+* [33m8ef3ac5[m Delete conversation_history.json
+* [33m2e37523[m Fix flood zones, warnings, cameras, and UI improvements - Fixed flood zone checkbox clicking issues - Fixed flood zone data only showing when zones are active - Added auto-close for popups (10s for new, 3s for updates) - Fixed warning service path issues - Updated dummy warnings script (removed description field) - Fixed camera image loading from camera_snapshots directory - Improved zone loading with async/await - Cleaned up unneeded files (backups, cache, duplicates)
+* [33mec9317c[m Add hotels feature, fix weather date filtering, update modules menu, and integrate traffic/construction data
+* [33m774c1c3[m Fix typo in Developer Set-Up Guide section
+* [33m74e6f33[m Correct setup guide title to 'Developer Set-Up Guide'
+* [33mf7b499c[m Rename READMEnew.md to README.md
+* [33me552b50[m Delete README.md
+* [33mafec9c0[m Create README for ReadyCorpusChristi project
+* [33me150a58[m Revise README with team members and formatting
+* [33mc0c2c47[m Revise README for ReadyCorpusChristi application
+* [33mb2064ed[m Fix formatting issues in README.md
+* [33m7a68df6[m Fix admin panel issues and improve error handling
+* [33mbab4208[m Add admin dashboard and warning management system
+* [33m567dce8[m Add safety evaluation popup, questionnaire, PDF export, and Groq AI integration
+* [33mf923a2d[m Initial Flask webapp with Groq AI chatbot and map integration
+* [33m2369945[m first commit

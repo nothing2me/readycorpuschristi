@@ -244,7 +244,22 @@ class ChatbotManager {
             
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
-            contentDiv.textContent = previewText;
+            
+            // Render markdown preview if marked.js is available
+            if (typeof marked !== 'undefined') {
+                try {
+                    marked.setOptions({
+                        breaks: true,
+                        gfm: true,
+                        sanitize: false
+                    });
+                    contentDiv.innerHTML = marked.parse(previewText);
+                } catch (e) {
+                    contentDiv.textContent = previewText;
+                }
+            } else {
+                contentDiv.textContent = previewText;
+            }
 
             const showButton = document.createElement('button');
             showButton.className = 'show-message-btn';
@@ -264,10 +279,30 @@ class ChatbotManager {
             messageDiv.appendChild(contentDiv);
             messageDiv.appendChild(buttonContainer);
         } else {
-            // Normal message display
+            // Normal message display with markdown rendering
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
-            contentDiv.textContent = text;
+            
+            // Render markdown if marked.js is available
+            if (typeof marked !== 'undefined') {
+                try {
+                    // Configure marked.js options
+                    marked.setOptions({
+                        breaks: true,
+                        gfm: true,
+                        sanitize: false
+                    });
+                    contentDiv.innerHTML = marked.parse(text);
+                } catch (e) {
+                    // Fallback to plain text if markdown parsing fails
+                    contentDiv.textContent = text;
+                    console.error('Markdown parsing error:', e);
+                }
+            } else {
+                // Fallback to plain text if marked.js is not available
+                contentDiv.textContent = text;
+            }
+            
             messageDiv.appendChild(contentDiv);
         }
 
@@ -276,21 +311,22 @@ class ChatbotManager {
         timeDiv.textContent = new Date().toLocaleTimeString();
         messageDiv.appendChild(timeDiv);
 
-        // Add download button for safety evaluation responses
+        // Add Download PDF button for safety evaluation responses
         if (type === 'bot' && metadata && metadata.isSafetyEvaluation) {
-            const downloadBtn = document.createElement('button');
-            downloadBtn.className = 'download-pdf-btn';
-            downloadBtn.textContent = '📥 Download PDF Report';
-            const self = this;
-            downloadBtn.onclick = function(e) {
-                self.downloadSafetyEvaluationPDF(metadata, e);
-            };
-            
             const buttonContainer = messageDiv.querySelector('.message-actions') || document.createElement('div');
             if (!messageDiv.querySelector('.message-actions')) {
                 buttonContainer.className = 'message-actions';
                 messageDiv.appendChild(buttonContainer);
             }
+            
+            // Download PDF button
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'download-pdf-btn';
+            downloadBtn.textContent = 'Download PDF';
+            const self = this;
+            downloadBtn.onclick = function(e) {
+                self.downloadSafetyEvaluationPDF(metadata, e);
+            };
             buttonContainer.appendChild(downloadBtn);
         }
 
@@ -330,20 +366,45 @@ class ChatbotManager {
 
         const popupBody = document.createElement('div');
         popupBody.className = 'message-popup-body';
-        popupBody.textContent = text; // textContent is safe
+        
+        // Render markdown in popup if marked.js is available
+        if (typeof marked !== 'undefined') {
+            try {
+                marked.setOptions({
+                    breaks: true,
+                    gfm: true,
+                    sanitize: false
+                });
+                popupBody.innerHTML = marked.parse(text);
+            } catch (e) {
+                popupBody.textContent = text;
+                console.error('Markdown parsing error in popup:', e);
+            }
+        } else {
+            popupBody.textContent = text;
+        }
 
         const popupActions = document.createElement('div');
         popupActions.className = 'message-popup-actions';
 
-        // Add download PDF button if it's a safety evaluation
+        // Add PDF buttons if it's a safety evaluation
         if (metadata && metadata.isSafetyEvaluation) {
             const downloadBtn = document.createElement('button');
             downloadBtn.className = 'download-pdf-btn';
-            downloadBtn.textContent = 'Download PDF Report';
+            downloadBtn.textContent = 'Download PDF';
             downloadBtn.onclick = (e) => {
                 this.downloadSafetyEvaluationPDF(metadata, e);
             };
             popupActions.appendChild(downloadBtn);
+            
+            // View PDF button - now part of Show Full Message popup
+            const viewBtn = document.createElement('button');
+            viewBtn.className = 'view-pdf-btn';
+            viewBtn.textContent = 'View PDF';
+            viewBtn.onclick = (e) => {
+                this.viewSafetyEvaluationPDF(metadata, e);
+            };
+            popupActions.appendChild(viewBtn);
         }
 
         popupContent.appendChild(popupHeader);
@@ -451,6 +512,60 @@ class ChatbotManager {
             if (downloadBtn) {
                 downloadBtn.disabled = false;
                 downloadBtn.textContent = 'Download PDF Report';
+            }
+        }
+    }
+
+    /**
+     * View safety evaluation PDF in viewer
+     */
+    async viewSafetyEvaluationPDF(metadata, event) {
+        try {
+            const viewBtn = event ? event.target : null;
+            if (viewBtn) {
+                viewBtn.disabled = true;
+                viewBtn.textContent = 'Loading PDF...';
+            }
+
+            const response = await fetch('/api/chatbot/download-pdf', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    evaluation_response: metadata.response,
+                    zipcode: metadata.zipcode || 'Unknown',
+                    stats: metadata.stats || {},
+                    evaluation_data: metadata.evaluation_data || null
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Get PDF blob
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            
+            // Open PDF viewer with the blob
+            if (window.pdfViewer) {
+                window.pdfViewer.openPDF(blobUrl, blob);
+            } else {
+                // Fallback: open in new tab
+                window.open(blobUrl, '_blank');
+            }
+            
+            if (viewBtn) {
+                viewBtn.disabled = false;
+                viewBtn.textContent = '👁️ View PDF';
+            }
+        } catch (error) {
+            console.error('PDF view error:', error);
+            this.addBotMessage(`Error viewing PDF: ${error.message}`, true);
+            if (viewBtn) {
+                viewBtn.disabled = false;
+                viewBtn.textContent = '👁️ View PDF';
             }
         }
     }

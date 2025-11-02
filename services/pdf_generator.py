@@ -302,10 +302,10 @@ class PDFGenerator:
     
     def _format_text_for_pdf(self, text: str) -> str:
         """
-        Format text for PDF output (escape HTML, handle formatting).
+        Format text for PDF output (escape HTML, handle markdown formatting).
         
         Args:
-            text: Raw text string
+            text: Raw text string with markdown formatting
         
         Returns:
             Formatted HTML string safe for ReportLab
@@ -313,11 +313,24 @@ class PDFGenerator:
         # Escape HTML characters first
         text = html.escape(text)
         
-        # Convert **bold** to <b>bold</b>
-        text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text)
+        # Convert **bold** to <b>bold</b> (avoid matching already processed patterns)
+        text = re.sub(r'\*\*([^*]+?)\*\*', r'<b>\1</b>', text)
         
-        # Convert *italic* to <i>italic</i>
-        text = re.sub(r'\*(.+?)\*', r'<i>\1</i>', text)
+        # Convert __bold__ to <b>bold</b>
+        text = re.sub(r'__([^_]+?)__', r'<b>\1</b>', text)
+        
+        # Convert *italic* to <i>italic</i> (only if not already bold)
+        # Match single asterisks that are not part of bold markers
+        text = re.sub(r'(?<!\*)\*([^*]+?)\*(?!\*)', r'<i>\1</i>', text)
+        
+        # Convert _italic_ to <i>italic</i>
+        text = re.sub(r'(?<!_)_([^_]+?)_(?!_)', r'<i>\1</i>', text)
+        
+        # Convert `code` to <font face="Courier">code</font>
+        text = re.sub(r'`([^`]+?)`', r'<font face="Courier" size="10">\1</font>', text)
+        
+        # Convert [link text](url) to link text (ReportLab doesn't support clickable links easily, so just show text)
+        text = re.sub(r'\[([^\]]+?)\]\([^\)]+?\)', r'\1', text)
         
         # Convert line breaks within paragraph to spaces (ReportLab will handle wrapping)
         text = text.replace('\n', ' ')

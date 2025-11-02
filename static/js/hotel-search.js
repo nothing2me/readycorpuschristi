@@ -27,12 +27,12 @@ class HotelSearchManager {
         this.currentHotels = [];
         this.showAllHotels = false; // Track if user wants to see all hotels
         
-        // Set default sorts
+        // Set default sorts to "no_preference"
         if (this.sortSelect) {
-            this.sortSelect.value = 'price_low_high';
+            this.sortSelect.value = 'no_preference';
         }
         if (this.distanceSortSelect) {
-            this.distanceSortSelect.value = 'closest_furthest';
+            this.distanceSortSelect.value = 'no_preference';
         }
         
         this.init();
@@ -257,11 +257,10 @@ class HotelSearchManager {
         const sortedHotelsList = [...hotels];
         
         // Get current sort options
-        const priceSortOption = this.sortSelect?.value || 'price_low_high';
-        const distanceSortOption = this.distanceSortSelect?.value || 'closest_furthest';
+        const priceSortOption = this.sortSelect?.value || 'no_preference';
+        const distanceSortOption = this.distanceSortSelect?.value || 'no_preference';
         
-        // Sort by price FIRST (cheapest first), then by distance (closest first for safety)
-        // This matches the backend sorting logic to ensure consistent results
+        // Apply sorting based on selected options
         if (priceSortOption === 'price_low_high') {
             sortedHotelsList.sort((a, b) => {
                 // Primary sort: Price (lowest first) - rounded to 2 decimals to match backend
@@ -274,13 +273,15 @@ class HotelSearchManager {
                     return priceDiff;
                 }
                 
-                // Secondary sort: Distance (closest first by default for evacuation safety)
-                // When prices are the same, show closest hotels first to Corpus Christi
-                const aDist = parseFloat(a.distance_miles) || Infinity;
-                const bDist = parseFloat(b.distance_miles) || Infinity;
-                return distanceSortOption === 'closest_furthest' 
-                    ? aDist - bDist  // Closest first (safer for evacuation)
-                    : bDist - aDist; // Furthest first
+                // Secondary sort: Distance (only if distance sort is not "no_preference")
+                if (distanceSortOption !== 'no_preference') {
+                    const aDist = parseFloat(a.distance_miles) || Infinity;
+                    const bDist = parseFloat(b.distance_miles) || Infinity;
+                    return distanceSortOption === 'closest_furthest' 
+                        ? aDist - bDist  // Closest first (safer for evacuation)
+                        : bDist - aDist; // Furthest first
+                }
+                return 0; // Maintain order when prices are equal and no distance preference
             });
         } else if (priceSortOption === 'price_high_low') {
             sortedHotelsList.sort((a, b) => {
@@ -294,15 +295,18 @@ class HotelSearchManager {
                     return priceDiff;
                 }
                 
-                // Secondary sort: Distance
-                const aDist = a.distance_miles || Infinity;
-                const bDist = b.distance_miles || Infinity;
-                return distanceSortOption === 'closest_furthest' 
-                    ? aDist - bDist 
-                    : bDist - aDist;
+                // Secondary sort: Distance (only if distance sort is not "no_preference")
+                if (distanceSortOption !== 'no_preference') {
+                    const aDist = a.distance_miles || Infinity;
+                    const bDist = b.distance_miles || Infinity;
+                    return distanceSortOption === 'closest_furthest' 
+                        ? aDist - bDist 
+                        : bDist - aDist;
+                }
+                return 0; // Maintain order when prices are equal and no distance preference
             });
-        } else {
-            // No price sort, just distance sort
+        } else if (distanceSortOption !== 'no_preference') {
+            // Only distance sort (no price preference)
             sortedHotelsList.sort((a, b) => {
                 const aDist = a.distance_miles || Infinity;
                 const bDist = b.distance_miles || Infinity;
@@ -311,6 +315,7 @@ class HotelSearchManager {
                     : bDist - aDist;
             });
         }
+        // If both are "no_preference", maintain original order (no sorting)
         
         // Store sorted hotels for expand functionality
         this.sortedHotels = sortedHotelsList;
@@ -327,14 +332,27 @@ class HotelSearchManager {
         if (this.hasFoodCheck?.checked) activeFilters.push('Food Service');
         if (this.vacancyCheck?.checked) activeFilters.push('Vacancy');
         
-        const priceSortText = this.sortSelect?.options[this.sortSelect?.selectedIndex]?.text || 'Price: Low to High';
-        const distanceSortText = this.distanceSortSelect?.options[this.distanceSortSelect?.selectedIndex]?.text || 'Closest to Furthest';
+        const priceSortText = this.sortSelect?.options[this.sortSelect?.selectedIndex]?.text || 'No Preference';
+        const distanceSortText = this.distanceSortSelect?.options[this.distanceSortSelect?.selectedIndex]?.text || 'No Preference';
+        
+        // Build sort info text
+        let sortInfoText = '';
+        if (priceSortOption !== 'no_preference' && distanceSortOption !== 'no_preference') {
+            sortInfoText = `Sorted by: ${priceSortText} (then ${distanceSortText})`;
+        } else if (priceSortOption !== 'no_preference') {
+            sortInfoText = `Sorted by: ${priceSortText}`;
+        } else if (distanceSortOption !== 'no_preference') {
+            sortInfoText = `Sorted by: ${distanceSortText}`;
+        } else {
+            sortInfoText = 'No sorting preference (displaying in original order)';
+        }
+        
         let html = `<div class="hotel-results-summary">
             <p>Found <strong>${sortedHotelsList.length}</strong> hotels in Texas</p>
-            ${!this.showAllHotels && hasMoreHotels ? `<p class="showing-info">Showing <strong>${hotelsToShow.length}</strong> of ${sortedHotelsList.length} hotels (closest and cheapest first)</p>` : ''}
+            ${!this.showAllHotels && hasMoreHotels ? `<p class="showing-info">Showing <strong>${hotelsToShow.length}</strong> of ${sortedHotelsList.length} hotels</p>` : ''}
             ${this.showAllHotels ? `<p class="showing-info">Showing all <strong>${sortedHotelsList.length}</strong> hotels</p>` : ''}
             ${activeFilters.length > 0 ? `<p class="active-filters">Active filters: ${activeFilters.join(', ')}</p>` : ''}
-            <p class="sort-info">Sorted by: ${priceSortText} (then ${distanceSortText})</p>
+            <p class="sort-info">${sortInfoText}</p>
         </div>`;
         
         html += '<div class="hotel-list">';
@@ -425,8 +443,8 @@ class HotelSearchManager {
         if (this.petFriendlyCheck) this.petFriendlyCheck.checked = false;
         if (this.hasFoodCheck) this.hasFoodCheck.checked = false;
         if (this.vacancyCheck) this.vacancyCheck.checked = true;
-        if (this.sortSelect) this.sortSelect.value = 'price_low_high'; // Default to Low to High
-        if (this.distanceSortSelect) this.distanceSortSelect.value = 'closest_furthest'; // Default to Closest to Furthest
+        if (this.sortSelect) this.sortSelect.value = 'no_preference'; // Default to No Preference
+        if (this.distanceSortSelect) this.distanceSortSelect.value = 'no_preference'; // Default to No Preference
         
         // Re-search with default filters
         this.searchHotels();
@@ -535,8 +553,10 @@ let hotelSearchManager;
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         hotelSearchManager = new HotelSearchManager();
+        window.hotelSearchManager = hotelSearchManager; // Make available globally
     });
 } else {
     hotelSearchManager = new HotelSearchManager();
+    window.hotelSearchManager = hotelSearchManager; // Make available globally
 }
 
