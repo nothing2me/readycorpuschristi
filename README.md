@@ -1,19 +1,24 @@
 # ReadyCorpusChristi
 
 ## Table of Contents
-- [Overview](#overview)
+- [Overview and Problem Statement](#overview-and-problem-statement)
 - [Features](#features)
+- [Video Walkthrough](#video-walkthrough).
 - [Technologies Used](#technologies-used)
 - [Developer Set-Up Guide](#developer-set-up-guide)
 - [Team Members](#team-members)
+- [Challenges](#challenges)
 - [License](#license)
 - [Acknowledgements](#acknowledgements)
 
 ---
 
-## Overview
-ReadyCorpusChristi collaborative web application devloped by **3++**, a team for the **Islander Hackathon 2025**. Our application includes an interactive map and AI chatbot functionality to provide a personalized and interactive emergency disaster preparedness and response for users to help them get relevant personal guidance for safety and security. 
+## Overview and Problem Statement
+With recent decreases in funding to the National Weather Services, the need for resources on critical weather and disaster preparedness has increased. This, along with increased climate extremes and variable factors such as the upcoming multipe-year hurricane season of the El Nino Southern Oscillation weather pattern mean that new or even long standing Corpus Christi residents may get caught off guard. This applications mitigates awareness and preparedness centralization issues in a free open source manner with personalized information relevant to users. 
 
+ReadyCorpusChristi is a collaborative web application devloped by **3++**, a team for **Islander Hackathon 2025**. Our application includes an interactive map and AI chatbot functionality to provide a personalized and interactive emergency disaster preparedness and response for users to help them get relevant personal guidance for increasing safety and security. 
+
+---
 
 ## Features
 
@@ -23,13 +28,19 @@ ReadyCorpusChristi collaborative web application devloped by **3++**, a team for
 - **AI Chatbot**: Interactive chatbot that uses user inputs for generation. 
 - **Disastery Plan Creation**: Export a printable PDF document for reference adding to the fridge. 
 
+## Video Walkthrough
+[![Watch the video](https://img.youtube.com/vi/T-D1KVIuvjA/maxresdefault.jpg)](https://youtu.be/T-D1KVIuvjA)
+
+
+
 ## Technologies Used
 
 | **Tech/Framework** | **Role**                    |
 |--------------------|-----------------------------|
 | Python             | Main programming language   |
 | Flask              | Framework                   |
-| Groq               | Hosting and API calls       |  
+| Groq               | API calls                   |  
+| NGrok              | Hosting                     |
 | LLamam 3           | LLM Used                    |
 | Open Street Map    | Interactive Map             |
 | Git                | Distributed version control |
@@ -134,11 +145,16 @@ To integrate other AI providers:
   ### Grace Williams - Requirements and Specifications
   ### Voss Purkey - Presenter and Tester
 
+## Challenges
+  ### Sourcing information and appropriately placing flood zone layers into the app. 
+  ### Generating appropriately readable outputs from the LLM to pdf format. 
+  ### Handling API request responses from multiple sources in a usable manner for the LLM "Disaster Specialist" generated content. 
+
 ## License
 
 This project is open source and available for modification.
 
-# readycorpuschristi
+# ReadyCorpusChristi
 
 
 
