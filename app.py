@@ -8,8 +8,12 @@ import os
 import re
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# Load environment variables (only if .env file exists)
+# On Vercel, environment variables are provided by the platform
+try:
+    load_dotenv()
+except Exception:
+    pass  # .env file not available, use platform environment variables
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
