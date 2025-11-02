@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ready Corpus Christi - Mobile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
+</head>
+<body>
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <h1>Ready Corpus Christi</h1>
+        <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+    </header>
+
+    <!-- Mobile Menu (Slides from Top) -->
+    <div class="mobile-menu-overlay" id="mobile-menu-overlay">
+        <div class="mobile-menu" id="mobile-menu">
+            <div class="mobile-menu-header">
+                <h2>Menu</h2>
+                <button class="mobile-menu-close" id="mobile-menu-close">×</button>
+            </div>
+            <div class="mobile-menu-content">
+                <div class="mobile-menu-item">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="mobile-weather-toggle" />
+                        <span class="slider"></span>
+                        <span class="toggle-label">Weather Forecast</span>
+                    </label>
+                </div>
+                <div class="mobile-menu-item">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="mobile-traffic-toggle" />
+                        <span class="slider"></span>
+                        <span class="toggle-label">Traffic Congestion</span>
+                    </label>
+                </div>
+                <div class="mobile-menu-item">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="mobile-evacuation-routes-toggle" />
+                        <span class="slider"></span>
+                        <span class="toggle-label">Evacuation Routes</span>
+                    </label>
+                </div>
+                <div class="mobile-menu-item">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="mobile-warnings-toggle" checked />
+                        <span class="slider"></span>
+                        <span class="toggle-label">Show Warnings</span>
+                    </label>
+                </div>
+                <div class="mobile-menu-item">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="mobile-cameras-toggle" checked />
+                        <span class="slider"></span>
+                        <span class="toggle-label">Show Cameras</span>
+                    </label>
+                </div>
+                <div class="mobile-menu-item">
+                    <button class="mobile-menu-button" id="mobile-hotel-search-btn">
+                        🏨 Search Hotels
+                    </button>
+                </div>
+                <div class="mobile-menu-item">
+                    <button class="mobile-menu-button" id="mobile-safety-eval-btn">
+                        ⚠️ Safety Evaluation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Screen Map -->
+    <div class="mobile-map-container" id="map-area">
+        <!-- Map will be rendered here -->
+    </div>
+
+    <!-- Address Search Bar (Collapsible) -->
+    <div class="mobile-address-bar" id="mobile-address-bar">
+        <div class="mobile-address-header" id="mobile-address-toggle">
+            <span>📍 Search Address</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="mobile-address-content" id="mobile-address-content" style="display: none;">
+            <input 
+                type="text" 
+                id="mobile-address-input" 
+                placeholder="Enter an address..."
+                autocomplete="off"
+            />
+            <button id="mobile-geocode-btn" type="button">Search</button>
+        </div>
+    </div>
+
+    <!-- Chatbot Bottom Sheet -->
+    <div class="mobile-chatbot-sheet" id="mobile-chatbot-sheet">
+        <div class="mobile-chatbot-handle" id="mobile-chatbot-handle">
+            <div class="handle-bar"></div>
+        </div>
+        <div class="mobile-chatbot-header">
+            <h3>AI Disaster Readiness Assistant</h3>
+            <button class="mobile-chatbot-close" id="mobile-chatbot-close">×</button>
+        </div>
+        <div class="mobile-chatbot-messages" id="mobile-chatbot-messages">
+            <!-- Messages will be displayed here -->
+        </div>
+        <div class="mobile-chatbot-input-area">
+            <input 
+                type="text" 
+                id="mobile-chatbot-input" 
+                placeholder="Type your message..."
+                autocomplete="off"
+            />
+            <button id="mobile-send-chat-btn" type="button">Send</button>
+        </div>
+    </div>
+
+    <!-- Floating Action Button for Chatbot -->
+    <button class="mobile-fab" id="mobile-chatbot-fab" aria-label="Open chatbot">
+        💬
+    </button>
+
+    <!-- Warning Legend (Collapsible) -->
+    <div class="mobile-legend" id="mobile-legend">
+        <div class="mobile-legend-toggle" id="mobile-legend-toggle">
+            <span>⚠️ Warnings</span>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="mobile-legend-content" id="mobile-legend-content" style="display: none;">
+            <div class="mobile-legend-items">
+                <div class="mobile-legend-item">
+                    <div class="mobile-legend-icon" style="background-color: #ff4444;">🔥</div>
+                    <span>Fire</span>
+                </div>
+                <div class="mobile-legend-item">
+                    <div class="mobile-legend-icon" style="background-color: #cc0000;">🚗</div>
+                    <span>Car Crash</span>
+                </div>
+                <div class="mobile-legend-item">
+                    <div class="mobile-legend-icon" style="background-color: #ff8800;">🚧</div>
+                    <span>Road Closure</span>
+                </div>
+                <div class="mobile-legend-item">
+                    <div class="mobile-legend-icon" style="background-color: #0066ff;">💧</div>
+                    <span>Flood</span>
+                </div>
+                <div class="mobile-legend-item">
+                    <div class="mobile-legend-icon" style="background-color: #ffdd00;">🌩️</div>
+                    <span>Weather</span>
+                </div>
+                <div class="mobile-legend-item">
+                    <div class="mobile-legend-icon" style="background-color: #888888;">⚠️</div>
+                    <span>Other</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+        <button class="mobile-nav-item" id="nav-map" data-view="map">
+            <span class="nav-icon">🗺️</span>
+            <span class="nav-label">Map</span>
+        </button>
+        <button class="mobile-nav-item" id="nav-warnings" data-view="warnings">
+            <span class="nav-icon">⚠️</span>
+            <span class="nav-label">Warnings</span>
+        </button>
+        <button class="mobile-nav-item" id="nav-menu" data-view="menu">
+            <span class="nav-icon">☰</span>
+            <span class="nav-label">Menu</span>
+        </button>
+        <button class="mobile-nav-item" id="nav-chat" data-view="chat">
+            <span class="nav-icon">💬</span>
+            <span class="nav-label">Chat</span>
+        </button>
+    </nav>
+
+    <!-- News Ticker at Bottom -->
+    <div class="mobile-news-ticker" id="mobile-news-ticker">
+        <div class="mobile-news-label">📰 RCC News:</div>
+        <div class="mobile-news-scroll" id="mobile-news-scroll">
+            <div class="mobile-news-loading">Loading news headlines...</div>
+        </div>
+    </div>
+
+    <!-- Safety Evaluation Popup Modal -->
+    <div id="mobile-safety-popup-modal" class="mobile-popup-modal">
+        <div class="mobile-popup-content">
+            <div class="mobile-popup-slide" id="mobile-slide-1">
+                <div class="mobile-popup-header">
+                    <h2>Test Your Disaster Readiness</h2>
+                </div>
+                <div class="mobile-popup-body">
+                    <label for="mobile-zipcode-input">Enter your zipcode:</label>
+                    <input 
+                        type="text" 
+                        id="mobile-zipcode-input" 
+                        placeholder="e.g., 78401"
+                        maxlength="5"
+                        pattern="[0-9]{5}"
+                    />
+                    <div class="mobile-question-section">
+                        <p>Do you want to begin the safety questionnaire?</p>
+                        <div class="privacy-disclaimer" style="margin-top: 15px; padding: 10px; background-color: #f5f5f5; border-radius: 4px; font-size: 12px; color: #666; line-height: 1.5;">
+                            <strong>Privacy Notice:</strong> Your responses are private and only available to you. We do not share your personal information or questionnaire answers with third parties.
+                        </div>
+                        <div class="mobile-popup-buttons" style="margin-top: 15px;">
+                            <button id="mobile-yes-questionnaire-btn" class="mobile-btn-primary">Yes</button>
+                            <button id="mobile-no-questionnaire-btn" class="mobile-btn-secondary">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mobile-popup-slide" id="mobile-slide-2" style="display: none;">
+                <div class="mobile-popup-header">
+                    <h2>Safety Questionnaire</h2>
+                    <button id="mobile-close-popup-btn" class="mobile-close-btn">×</button>
+                </div>
+                <div class="mobile-popup-body mobile-questionnaire-body">
+                    <div id="mobile-questionnaire-questions">
+                        <!-- Questions will be generated by JavaScript -->
+                    </div>
+                    <div class="mobile-popup-buttons">
+                        <button id="mobile-done-questionnaire-btn" class="mobile-btn-primary">Done</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Creation Popup -->
+    <div id="mobile-warning-popup-modal" class="mobile-popup-modal">
+        <div class="mobile-popup-content mobile-warning-popup-content">
+            <div class="mobile-popup-header">
+                <h2>Add Warning</h2>
+                <button id="mobile-close-warning-popup-btn" class="mobile-close-btn">×</button>
+            </div>
+            <div class="mobile-popup-body">
+                <label for="mobile-warning-title">Title:</label>
+                <input 
+                    type="text" 
+                    id="mobile-warning-title" 
+                    placeholder="Enter warning title..."
+                    autocomplete="off"
+                />
+                
+                <label style="margin-top: 20px;">Warning Type:</label>
+                <div class="mobile-warning-types">
+                    <label class="mobile-warning-type-option">
+                        <input type="checkbox" name="mobile-warning-type" value="fire" />
+                        <span>Fire</span>
+                    </label>
+                    <label class="mobile-warning-type-option">
+                        <input type="checkbox" name="mobile-warning-type" value="car-crash" />
+                        <span>Car Crash</span>
+                    </label>
+                    <label class="mobile-warning-type-option">
+                        <input type="checkbox" name="mobile-warning-type" value="road-closure" />
+                        <span>Road Closure</span>
+                    </label>
+                    <label class="mobile-warning-type-option">
+                        <input type="checkbox" name="mobile-warning-type" value="flood" />
+                        <span>Flood</span>
+                    </label>
+                    <label class="mobile-warning-type-option">
+                        <input type="checkbox" name="mobile-warning-type" value="weather" />
+                        <span>Weather</span>
+                    </label>
+                    <label class="mobile-warning-type-option">
+                        <input type="checkbox" name="mobile-warning-type" value="other" id="mobile-warning-type-other" />
+                        <span>Other</span>
+                    </label>
+                </div>
+                
+                <div id="mobile-warning-other-input" style="display: none; margin-top: 15px;">
+                    <label for="mobile-warning-other-text">Specify Other Type:</label>
+                    <input 
+                        type="text" 
+                        id="mobile-warning-other-text" 
+                        placeholder="Enter warning type..."
+                        autocomplete="off"
+                    />
+                </div>
+                
+                <label for="mobile-warning-expiry-time" style="margin-top: 20px;">Expiry Time:</label>
+                <input 
+                    type="datetime-local" 
+                    id="mobile-warning-expiry-time"
+                    autocomplete="off"
+                />
+                
+                <div class="mobile-popup-buttons" style="margin-top: 25px;">
+                    <button id="mobile-submit-warning-btn" class="mobile-btn-primary">Submit Warning</button>
+                    <button id="mobile-cancel-warning-btn" class="mobile-btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mobile.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mobile-chatbot.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mobile-news.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/evacuation-routes.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/warning-loader.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/camera-loader.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/traffic-layer.js') }}"></script>
+</body>
+</html>
+
