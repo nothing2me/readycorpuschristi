@@ -30,7 +30,7 @@ ReadyCorpusChristi is a collaborative web application devloped by **3++**, a tea
 
 ## Video Walkthrough
 
-[![Watch the video](https://img.youtube.com/vi/FZ9KeVev494/maxresdefault.jpg)](https://www.youtube.com/watch?v=FZ9KeVev494)
+[![(https://img.youtube.com/vi/FZ9KeVev494/maxresdefault.jpg)](https://www.youtube.com/watch?v=FZ9KeVev494)]
 
 
 
