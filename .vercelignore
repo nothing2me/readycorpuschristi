@@ -20,6 +20,7 @@ conversation_history.json
 warnings.json
 flood_zones.json
 cameras_data.json
+requirements-dev.txt
 .env
 .env.local
 .venv/
