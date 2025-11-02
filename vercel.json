@@ -1,27 +1,22 @@
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "api/vercel.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
+      "source": "/api/(.*)",
+      "destination": "/api/vercel.py"
     },
     {
-      "src": "/mapzone/(.*)",
-      "dest": "/mapzone/$1"
+      "source": "/static/(.*)",
+      "destination": "/api/vercel.py"
     },
     {
-      "src": "/(.*)",
-      "dest": "/api/vercel.py"
+      "source": "/mapzone/(.*)",
+      "destination": "/api/vercel.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/api/vercel.py"
     }
-  ],
-  "env": {
-    "PYTHON_VERSION": "3.12"
-  }
+  ]
 }
 
