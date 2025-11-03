@@ -16,7 +16,13 @@ class AdminLogService:
     def __init__(self, log_file: str = None):
         # Create logs directory if it doesn't exist
         self.logs_dir = Path('logs')
-        self.logs_dir.mkdir(exist_ok=True)
+        self._in_memory = False
+        self._memory_storage = {}  # Fallback in-memory storage
+        try:
+            self.logs_dir.mkdir(exist_ok=True)
+        except (IOError, PermissionError, OSError) as e:
+            print(f"Warning: Could not create logs directory: {e}. Using in-memory storage.")
+            self._in_memory = True
         
         # Set log file path to logs folder
         if log_file is None:
@@ -64,24 +70,36 @@ class AdminLogService:
             except Exception as e:
                 print(f"Could not migrate old log file: {e}")
         
-        if not os.path.exists(self.log_file):
-            with open(self.log_file, 'w', encoding='utf-8') as f:
-                json.dump({}, f)
+        try:
+            if not os.path.exists(self.log_file):
+                with open(self.log_file, 'w', encoding='utf-8') as f:
+                    json.dump({}, f)
+        except (IOError, PermissionError, OSError) as e:
+            print(f"Warning: Could not create {self.log_file}: {e}. Using in-memory storage.")
+            self._in_memory = True
     
     def _load_log(self) -> Dict[str, Any]:
         """Load all admin logs from JSON file"""
+        if self._in_memory:
+            return self._memory_storage
         try:
             with open(self.log_file, 'r', encoding='utf-8') as f:
                 log = json.load(f)
                 return log if isinstance(log, dict) else {}
-        except (json.JSONDecodeError, FileNotFoundError):
+        except (json.JSONDecodeError, FileNotFoundError, IOError, PermissionError):
             return {}
     
     def _save_log(self, log: Dict[str, Any]):
         """Save admin log to JSON file"""
+        if self._in_memory:
+            self._memory_storage = log
+            return
         try:
             # Ensure logs directory exists
-            self.logs_dir.mkdir(exist_ok=True)
+            try:
+                self.logs_dir.mkdir(exist_ok=True)
+            except (IOError, PermissionError, OSError):
+                pass  # Directory might already exist or can't be created
             
             # Create backup of existing log before writing
             if os.path.exists(self.log_file):
@@ -94,9 +112,16 @@ class AdminLogService:
             
             with open(self.log_file, 'w', encoding='utf-8') as f:
                 json.dump(log, f, indent=2, ensure_ascii=False)
+        except (IOError, PermissionError, OSError) as e:
+            # In serverless environments, file writes may fail - use in-memory storage
+            print(f"Warning: Could not save to {self.log_file}: {e}. Using in-memory storage.")
+            self._in_memory = True
+            self._memory_storage = log
         except Exception as e:
             print(f"Error saving admin log file: {e}")
-            raise
+            # Don't raise - just use in-memory storage
+            self._in_memory = True
+            self._memory_storage = log
     
     def log_interaction(
         self, 

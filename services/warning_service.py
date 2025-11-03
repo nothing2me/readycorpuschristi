@@ -11,27 +11,46 @@ from typing import List, Dict, Any, Optional
 class WarningService:
     def __init__(self, db_file: str = 'warnings.json'):
         self.db_file = db_file
+        self._in_memory = False
+        self._memory_storage = []  # Fallback in-memory storage
         self._ensure_db_file()
     
     def _ensure_db_file(self):
         """Create the JSON database file if it doesn't exist"""
-        if not os.path.exists(self.db_file):
-            with open(self.db_file, 'w') as f:
-                json.dump([], f)
+        try:
+            if not os.path.exists(self.db_file):
+                with open(self.db_file, 'w') as f:
+                    json.dump([], f)
+        except (IOError, PermissionError, OSError) as e:
+            # In serverless environments (like Vercel), file writes may not be allowed
+            # This is okay - we'll work with in-memory data instead
+            print(f"Warning: Could not create {self.db_file}: {e}. Using in-memory storage.")
+            self._in_memory = True
     
     def _load_warnings(self) -> List[Dict[str, Any]]:
         """Load all warnings from JSON file"""
+        if self._in_memory:
+            return self._memory_storage
         try:
             with open(self.db_file, 'r') as f:
                 warnings = json.load(f)
                 return warnings if isinstance(warnings, list) else []
-        except (json.JSONDecodeError, FileNotFoundError):
+        except (json.JSONDecodeError, FileNotFoundError, IOError, PermissionError):
             return []
     
     def _save_warnings(self, warnings: List[Dict[str, Any]]):
         """Save warnings to JSON file"""
-        with open(self.db_file, 'w') as f:
-            json.dump(warnings, f, indent=2)
+        if self._in_memory:
+            self._memory_storage = warnings
+            return
+        try:
+            with open(self.db_file, 'w') as f:
+                json.dump(warnings, f, indent=2)
+        except (IOError, PermissionError, OSError) as e:
+            # In serverless environments, file writes may fail - use in-memory storage
+            print(f"Warning: Could not save to {self.db_file}: {e}. Using in-memory storage.")
+            self._in_memory = True
+            self._memory_storage = warnings
     
     def is_expired(self, warning: Dict[str, Any], hours: int = 24) -> bool:
         """Check if a warning is expired (default 24 hours or uses expiry_time if set)"""

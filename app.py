@@ -15,7 +15,16 @@ try:
 except Exception:
     pass  # .env file not available, use platform environment variables
 
-app = Flask(__name__)
+# Determine the base directory (works in both local and Vercel serverless environments)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Create Flask app with explicit static and template folders for serverless compatibility
+app = Flask(
+    __name__,
+    static_folder=os.path.join(BASE_DIR, 'static'),
+    static_url_path='/static',
+    template_folder=os.path.join(BASE_DIR, 'templates')
+)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 def is_mobile_device(user_agent):
@@ -39,7 +48,8 @@ def is_mobile_device(user_agent):
 @app.route('/mapzone/<path:filename>')
 def serve_mapzone(filename):
     """Serve flood zone images from mapzone directory"""
-    return send_from_directory('mapzone', filename)
+    mapzone_dir = os.path.join(BASE_DIR, 'mapzone')
+    return send_from_directory(mapzone_dir, filename)
 
 # Register blueprints for modular architecture
 from routes.chatbot import chatbot_bp
