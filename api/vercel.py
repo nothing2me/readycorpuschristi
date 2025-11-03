@@ -57,11 +57,15 @@ except Exception as e:
         @error_app.route('/', defaults={'path': ''})
         @error_app.route('/<path:path>')
         def error_handler_func(path):
+            try:
+                tb_str = traceback.format_exc()
+            except:
+                tb_str = str(e)
+            
             return jsonify({
                 'error': 'Application initialization failed',
                 'message': error_message,
-                'type': type(e).__name__,
-                'traceback': traceback.format_exc() if hasattr(traceback, 'format_exc') else None
+                'type': type(e).__name__
             }), 500
         
         handler = error_app

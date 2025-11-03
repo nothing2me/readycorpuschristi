@@ -8,7 +8,14 @@ import os
 from datetime import datetime
 from services.chatbot_service import ChatbotService
 from services.safety_evaluation_template import SafetyEvaluationTemplate
-from services.pdf_generator import PDFGenerator
+# Make PDFGenerator import optional - reportlab may fail in some environments
+try:
+    from services.pdf_generator import PDFGenerator
+    PDF_GENERATOR_AVAILABLE = True
+except ImportError as e:
+    PDF_GENERATOR_AVAILABLE = False
+    PDFGenerator = None
+    print(f"Warning: PDFGenerator not available: {e}")
 from services.conversation_history_service import ConversationHistoryService
 from services.admin_log_service import AdminLogService
 from services.weather_service import WeatherService
@@ -42,6 +49,8 @@ def get_safety_template():
 def get_pdf_generator():
     """Get or create PDF generator (lazy initialization)"""
     global _pdf_generator
+    if not PDF_GENERATOR_AVAILABLE:
+        raise ImportError("PDFGenerator is not available (reportlab may not be installed)")
     if _pdf_generator is None:
         _pdf_generator = PDFGenerator()
     return _pdf_generator
@@ -384,7 +393,10 @@ def download_pdf():
             return jsonify({'error': 'Evaluation response is required'}), 400
         
         # Get services (lazy initialization)
-        pdf_generator = get_pdf_generator()
+        try:
+            pdf_generator = get_pdf_generator()
+        except ImportError as e:
+            return jsonify({'error': 'PDF generation is not available', 'message': str(e)}), 503
         
         # Generate PDF
         pdf_buffer = pdf_generator.generate_safety_evaluation_pdf(
