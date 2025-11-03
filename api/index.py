@@ -1,5 +1,5 @@
 """
-Vercel Python handler - wrap Flask app to avoid Vercel's class inspection bug
+Vercel Python handler - export Flask app as WSGI function
 """
 
 import sys
@@ -17,21 +17,7 @@ except:
     pass
 
 # Import Flask app
-from app import app as flask_app
+from app import app
 
-# Create a wrapper class that Vercel's inspection can handle
-class FlaskHandler:
-    """Wrapper class for Flask app to avoid Vercel's issubclass check bug"""
-    def __init__(self, app):
-        self.app = app
-    
-    def __call__(self, environ, start_response):
-        """WSGI callable - delegate to Flask app"""
-        return self.app(environ, start_response)
-    
-    def wsgi_app(self, environ, start_response):
-        """Alternative WSGI interface"""
-        return self.app(environ, start_response)
-
-# Export handler as a callable class instance
-handler = FlaskHandler(flask_app)
+# Export as a simple WSGI function - Vercel should accept this
+handler = app
