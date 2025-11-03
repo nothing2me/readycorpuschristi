@@ -1,5 +1,5 @@
 """
-Vercel Python handler - custom WSGI class that avoids class inspection bug
+Vercel Python handler - function-based WSGI wrapper
 """
 
 import sys
@@ -13,17 +13,19 @@ try:
 except:
     pass
 
-from app import app as flask_app
+# Lazy import - delay importing Flask app until handler is called
+_flask_app = None
 
-# Create a simple class that only inherits from object to avoid Vercel's issubclass bug
-class WSGIHandler(object):
-    """Simple WSGI handler that delegates to Flask - inherits only from object"""
-    def __init__(self, app):
-        self.app = app
-    
-    def __call__(self, environ, start_response):
-        """WSGI interface"""
-        return self.app(environ, start_response)
+def _get_app():
+    """Lazy load Flask app"""
+    global _flask_app
+    if _flask_app is None:
+        from app import app
+        _flask_app = app
+    return _flask_app
 
-# Export handler as instance of simple class
-handler = WSGIHandler(flask_app)
+# Handler is a simple function - no class inheritance at all
+def handler(environ, start_response):
+    """WSGI handler function"""
+    app = _get_app()
+    return app(environ, start_response)
