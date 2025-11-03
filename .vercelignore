@@ -26,4 +26,6 @@ requirements-dev.txt
 .venv/
 venv/
 ENV/
+# Note: camera_snapshots and mapzone directories are INCLUDED for deployment
+# Note: static and templates directories are INCLUDED for deployment
 

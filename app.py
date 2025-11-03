@@ -51,6 +51,13 @@ def serve_mapzone(filename):
     mapzone_dir = os.path.join(BASE_DIR, 'mapzone')
     return send_from_directory(mapzone_dir, filename)
 
+# Serve camera snapshots (for direct access)
+@app.route('/camera_snapshots/<path:filename>')
+def serve_camera_snapshot(filename):
+    """Serve camera snapshot images"""
+    camera_snapshots_dir = os.path.join(BASE_DIR, 'camera_snapshots')
+    return send_from_directory(camera_snapshots_dir, filename)
+
 # Register blueprints for modular architecture
 # Wrap each import in try/except to prevent one failing route from crashing the entire app
 blueprints = [
