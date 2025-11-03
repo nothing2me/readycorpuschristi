@@ -1,161 +1,375 @@
-# ReadyCorpusChristi
+# ReadyCorpusChristi 🌊
 
-## Table of Contents
-- [Overview and Problem Statement](#overview-and-problem-statement)
-- [Features](#features)
-- [Video Walkthrough](#video-walkthrough).
-- [Technologies Used](#technologies-used)
-- [Developer Set-Up Guide](#developer-set-up-guide)
-- [Team Members](#team-members)
-- [Challenges](#challenges)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.0.0-green.svg)](https://flask.palletsprojects.com/)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black)](https://vercel.com)
+
+**A comprehensive disaster preparedness and emergency response web application for Corpus Christi, Texas.**
 
 ---
 
-## Overview and Problem Statement
-With recent decreases in funding to the National Weather Services, the need for resources on critical weather and disaster preparedness has increased. This, along with increased climate extremes and variable factors such as the upcoming multipe-year hurricane season of the El Nino Southern Oscillation weather pattern mean that new or even long standing Corpus Christi residents may get caught off guard. This applications mitigates awareness and preparedness centralization issues in a free open source manner with personalized information relevant to users. 
+## 📋 Table of Contents
 
-ReadyCorpusChristi is a collaborative web application devloped by **3++**, a team for **Islander Hackathon 2025**. Our application includes an interactive map and AI chatbot functionality to provide a personalized and interactive emergency disaster preparedness and response for users to help them get relevant personal guidance for increasing safety and security. 
+- [Overview](#overview)
+- [Features](#-features)
+- [Technologies](#-technologies)
+- [Quick Start](#-quick-start) 🎯 **Start Here!**
+- [Setup & Deployment](#-setup--deployment)
+- [Installation](#-installation)
+- [Configuration](#-configuration)
+- [API Documentation](#-api-documentation)
+- [Project Structure](#-project-structure)
+- [Development](#-development)
+- [Deployment](#-deployment)
+- [Contributing](#-contributing)
+- [Team](#-team)
+- [License](#-license)
 
 ---
 
-## Features
+## Overview
 
-- **Interactive Map**: Uses Leaflet.js with OpenStreetMap for displaying map data.
-- **Street Cam Integration**: View recent feeds in your area to check traffic and neighborhoods for damage and flooding.
-- **Warning Updates and Creation**: View and contribute icons and warnings of flooding, fires, or other hazards in your area.
-- **AI Chatbot**: Interactive chatbot that uses user inputs for generation. 
-- **Disastery Plan Creation**: Export a printable PDF document for reference adding to the fridge. 
+ReadyCorpusChristi is a collaborative web application developed by **3++** for **Islander Hackathon 2025**. The application addresses critical weather and disaster preparedness awareness gaps by providing a centralized, personalized emergency preparedness and response platform.
 
-## Video Walkthrough
-[![Watch the Demo Video](https://img.youtube.com/vi/FZ9KeVev494/hqdefault.jpg)](https://www.youtube.com/watch?v=FZ9KeVev494)
+### Problem Statement
 
+With recent decreases in funding to National Weather Services and increasing climate extremes, residents of Corpus Christi need accessible, personalized disaster preparedness resources. ReadyCorpusChristi centralizes emergency information and provides AI-powered guidance to help residents prepare for hurricanes, floods, and other emergencies.
 
-## Technologies Used
+### Key Features
 
-| **Tech/Framework** | **Role**                    |
-|--------------------|-----------------------------|
-| Python             | Main programming language   |
-| Flask              | Framework                   |
-| Groq               | API calls                   |  
-| NGrok and Versel   | Hosting                     |
-| LLamam 3           | LLM Used                    |
-| Open Street Map    | Interactive Map             |
-| Git                | Distributed version control |
-| GitHub             | Git hosting platform        |
+- 🗺️ **Interactive Map**: Real-time flood zones, warnings, and evacuation routes
+- 🤖 **AI Chatbot**: Context-aware disaster preparedness specialist
+- 📹 **Street Cam Integration**: Live traffic and neighborhood monitoring
+- ⚠️ **Warning System**: Community-driven hazard reporting
+- 📄 **PDF Reports**: Printable disaster preparedness plans
+- 📱 **Mobile Responsive**: Works on all devices
 
+---
 
-## Developer Set-Up Guide
+## ✨ Features
 
-### 1. Install Python
-### 2. Install IDE of choice
-### 3. Run setup script
+### Core Features
 
-      pip install -r requirements.txt
+- **Interactive Map** - Leaflet.js with OpenStreetMap displaying flood zones, warnings, and evacuation routes
+- **AI Chatbot** - Groq-powered assistant providing personalized disaster preparedness guidance
+- **Street Cam Integration** - View live traffic and neighborhood feeds for damage and flooding assessment
+- **Warning System** - Create and view community warnings for fires, floods, road closures, and more
+- **Safety Evaluation** - Comprehensive questionnaire generating personalized preparedness recommendations
+- **PDF Generation** - Downloadable disaster preparedness plans
+- **Weather Integration** - Real-time weather data from National Weather Service
+- **Traffic Monitoring** - Current traffic and construction conditions
+- **Hotel Search** - Find evacuation accommodations
+- **News Ticker** - Local disaster-related news updates
 
+---
 
-### 2. Create Environment File (Optional)
+## 🛠️ Technologies
 
-The application comes with Groq API integration pre-configured. Create a `.env` file in the root directory to customize:
+| **Technology** | **Purpose** |
+|---------------|-------------|
+| **Python 3.12+** | Backend programming language |
+| **Flask 3.0.0** | Web framework |
+| **Groq API** | LLM provider (Llama 3.1 8B Instant) |
+| **Leaflet.js** | Interactive mapping |
+| **OpenStreetMap** | Map data provider |
+| **National Weather Service API** | Weather data |
+| **Vercel** | Hosting platform |
+| **ReportLab** | PDF generation |
+| **BeautifulSoup4** | Web scraping |
+| **NumPy/Pillow** | Image processing |
+
+---
+
+## 🚀 Quick Start
+
+### 🎯 New Users Start Here!
+
+**Want to deploy in 5 minutes?** See [QUICK_START.md](QUICK_START.md) for the fastest deployment path!
+
+For detailed step-by-step instructions, see [SETUP.md](SETUP.md).
+
+### For Local Development
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/readycorpuschristi.git
+   cd readycorpuschristi
+   ```
+
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your API keys
+   ```
+
+4. **Run the application**
+   ```bash
+   python app.py
+   ```
+
+5. **Access the application**
+   - Open your browser to `http://localhost:5000`
+
+### Quick Deploy to Vercel
+
+See [SETUP.md](SETUP.md) for complete deployment instructions.
+
+---
+
+## 📋 Setup & Deployment
+
+**New users should start here!** See [SETUP.md](SETUP.md) for complete step-by-step instructions to:
+- Clone the repository
+- Add to your GitHub repo
+- Deploy to Vercel in minutes
+- Configure environment variables
+- Troubleshoot common issues
+
+**Quick deploy checklist:**
+1. Clone the repo
+2. Push to your GitHub
+3. Connect to Vercel
+4. Set environment variables
+5. Deploy! 🚀
+
+See [SETUP.md](SETUP.md) for details.
+
+---
+
+## ⚙️ Configuration
+
+### Environment Variables
+
+Create a `.env` file in the root directory (see `.env.example` for template):
 
 ```env
-# AI Chatbot Configuration (Groq API is pre-configured)
+# AI Chatbot Configuration
 GROQ_API_KEY=your-groq-api-key-here
 GROQ_MODEL=llama-3.1-8b-instant
 AI_PROVIDER=groq
+
+# Admin Configuration
+ADMIN_PASSWORD=your-secure-admin-password
+
+# Flask Configuration
+FLASK_ENV=production
+SECRET_KEY=your-secret-key-here
 ```
 
-**Note**: The Groq API key is already configured in the code as a default fallback, so the application will work immediately after installation.
+### API Keys
 
-### 3. Run the Application
+- **Groq API**: Sign up at [groq.com](https://groq.com) to get an API key
+- **Admin Password**: Set a secure password for admin endpoints
 
-```bash
-python app.py
-```
+---
 
-The application will be available at `http://localhost:5000`
-
-## Usage
-
-1. **Enter an Address**: Type an address in the input field and click "Search" to geocode it and display on the map
-2. **Click on Map**: Click anywhere on the map to reverse geocode the coordinates and get the address
-3. **Chat with AI**: Use the chatbot section to interact with the AI assistant. The chatbot can use map context (current location) when available
-
-## API Endpoints
+## 📖 API Documentation
 
 ### Chatbot API (`/api/chatbot`)
 
-- `POST /api/chatbot/message` - Send a message to the chatbot
+- `POST /api/chatbot/message` - Send message to AI chatbot
+- `POST /api/chatbot/safety-evaluation` - Submit safety evaluation questionnaire
+- `POST /api/chatbot/download-pdf` - Generate PDF from evaluation
 - `GET /api/chatbot/health` - Health check
 
-### Map Data API (`/api/map`)
+### Map API (`/api/map`)
 
 - `POST /api/map/geocode` - Geocode an address
 - `POST /api/map/reverse-geocode` - Reverse geocode coordinates
 - `GET /api/map/health` - Health check
 
-## Extending the Application
+### Warnings API (`/api/warnings`)
 
-### Adding a New AI Provider
+- `POST /api/warnings/create` - Create a warning
+- `GET /api/warnings/all` - Get all warnings
+- `POST /api/warnings/nearby` - Get warnings near location
+- `DELETE /api/warnings/<id>` - Delete a warning
 
-1. Update `services/chatbot_service.py`:
-   - Add a method for your provider (e.g., `_call_openai_api`)
-   - Update the `get_response` method to use your provider
+### Other APIs
 
-### Adding a New Map Provider
+- `/api/weather/forecast` - Weather data
+- `/api/traffic/congestion` - Traffic data
+- `/api/flood-zones/all` - Flood zone data
+- `/api/admin/*` - Admin endpoints (requires authentication)
 
-1. Update `services/map_service.py`:
-   - Add methods for your provider (e.g., `_geocode_google`)
-   - Update the `geocode_address` and `reverse_geocode` methods
+See [docs/API.md](docs/API.md) for complete API documentation.
 
-### Adding New Routes
+---
 
-1. Create a new blueprint in `routes/`
-2. Register it in `app.py` using `app.register_blueprint()`
+## 📁 Project Structure
 
-### Adding New Features
+```
+readycorpuschristi/
+├── app.py                      # Main Flask application entry point
+├── api/                        # Vercel serverless handlers
+│   └── index.py               # Vercel entry point
+├── routes/                     # API route handlers (blueprints)
+│   ├── chatbot.py             # Chatbot API routes
+│   ├── warnings.py            # Warning management routes
+│   ├── weather.py             # Weather API routes
+│   └── ...                    # Other route modules
+├── services/                   # Business logic layer
+│   ├── chatbot_service.py     # AI chatbot service
+│   ├── warning_service.py     # Warning management service
+│   └── ...                    # Other service modules
+├── static/                     # Static assets
+│   ├── css/                   # Stylesheets
+│   ├── js/                    # JavaScript modules
+│   ├── fonts/                 # Web fonts
+│   └── CC.png                 # Logo/assets
+├── templates/                  # HTML templates
+│   ├── index.html             # Main application page
+│   ├── admin.html             # Admin dashboard
+│   └── mobile.html            # Mobile version
+├── scripts/                    # Utility scripts
+├── mapzone/                    # Flood zone overlay images
+├── camera_snapshots/           # Traffic camera images
+├── requirements.txt            # Python dependencies
+├── vercel.json                 # Vercel deployment config
+├── .env.example               # Environment variable template
+├── LICENSE                     # MIT License
+└── README.md                   # This file
+```
 
-- Add new services in `services/`
-- Add new routes in `routes/`
-- Update frontend JavaScript in `static/js/`
-- Update styles in `static/css/style.css`
+---
 
-## Current Map Provider
+## 💻 Development
 
-The application currently uses **Nominatim** (OpenStreetMap) for geocoding, which is free and doesn't require an API key.
+### Running Locally
 
-## Current Chatbot Provider
+```bash
+# Install dependencies
+pip install -r requirements.txt
 
-The application uses **Groq API** with the **llama-3.1-8b-instant** model by default. The API key is pre-configured, so it works immediately.
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your configuration
 
-To customize:
-1. Set `GROQ_API_KEY` in `.env` (or it uses the default)
-2. Set `GROQ_MODEL` to change the model (default: `llama-3.1-8b-instant`)
-3. Set `AI_PROVIDER=groq` (default)
+# Run the application
+python app.py
+```
 
-To integrate other AI providers:
-1. Update `services/chatbot_service.py` to add provider methods
-2. Set `AI_API_KEY` and `AI_PROVIDER` in `.env`
+### Development Dependencies
 
-## Team Members
-  ### Noah Wilborn - BackEnd Developer
-  ### Mihail Stegall - FrontEnd Developer
-  ### Grace Williams - Requirements and Specifications
-  ### Voss Purkey - Presenter and Tester
+For development with additional tools:
 
-## Challenges
-  ### Sourcing information and appropriately placing flood zone layers into the app. 
-  ### Generating appropriately readable outputs from the LLM to pdf format. 
-  ### Handling API request responses from multiple sources in a usable manner for the LLM "Disaster Specialist" generated content. 
+```bash
+pip install -r requirements-dev.txt
+```
 
-## License
+### Code Style
 
-This project is open source and available for modification.
+- **Python**: Follow PEP 8 guidelines
+- **JavaScript**: Use ES6+ syntax, consistent formatting
+- **HTML/CSS**: Semantic HTML, organized CSS
 
-# ReadyCorpusChristi
+---
 
+## 🚢 Deployment
 
+### Quick Deploy to Vercel
 
+**For complete step-by-step instructions, see [SETUP.md](SETUP.md)**
 
+1. **Clone and push to your GitHub repository**
+2. **Connect to Vercel**
+   - Go to [vercel.com](https://vercel.com)
+   - Sign in with GitHub
+   - Click "New Project"
+   - Select your repository
 
+3. **Configure Environment Variables**
+   - Add `GROQ_API_KEY` (get from [groq.com](https://console.groq.com/))
+   - Add `ADMIN_PASSWORD` (choose a secure password)
+   - Add `SECRET_KEY` (generate a random key)
+   - Add `FLASK_ENV=production`
+
+4. **Deploy**
+   - Click "Deploy"
+   - Wait ~2 minutes
+   - Your app is live! 🎉
+
+The application automatically detects serverless environments and uses appropriate storage (in-memory or `/tmp` directory).
+
+### Detailed Deployment Guide
+
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for comprehensive deployment instructions.
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### Quick Contribution Guide
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Make your changes
+4. Commit with clear messages
+5. Push to your fork
+6. Create a Pull Request
+
+---
+
+## 👥 Team
+
+**3++ Team - Islander Hackathon 2025**
+
+- **Noah Wilborn** - Backend Developer
+- **Mihail Stegall** - Frontend Developer
+- **Grace Williams** - Requirements and Specifications
+- **Voss Purkey** - Presenter and Tester
+
+---
+
+## 📹 Demo
+
+[![Watch the Demo Video](https://img.youtube.com/vi/FZ9KeVev494/hqdefault.jpg)](https://www.youtube.com/watch?v=FZ9KeVev494)
+
+---
+
+## 🎯 Challenges Addressed
+
+During development, we overcame several challenges:
+
+1. **Flood Zone Integration** - Sourcing and appropriately placing flood zone layers on the map
+2. **PDF Generation** - Converting LLM outputs to readable PDF format
+3. **API Integration** - Handling responses from multiple sources for the AI chatbot context
+4. **Serverless Deployment** - Adapting file storage for Vercel's read-only filesystem
+5. **Vercel Detection** - Ensuring proper Flask framework detection
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- National Weather Service for free weather API
+- OpenStreetMap for mapping data
+- Groq for AI API services
+- Leaflet.js for mapping capabilities
+- Corpus Christi emergency services for verified contact information
+
+---
+
+## 📞 Support
+
+For issues, questions, or contributions, please:
+- Open an issue on GitHub
+- Contact the development team
+- Review the [API Documentation](docs/API.md)
+
+---
+
+**Made with ❤️ for Corpus Christi residents**

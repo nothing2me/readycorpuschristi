@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "readycorpuschristi"
+version = "1.0.0"
+description = "Disaster preparedness and emergency response web application for Corpus Christi, Texas"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "3++ Team", email = ""}
+]
+keywords = ["flask", "disaster-preparedness", "emergency-response", "corpus-christi"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: Flask",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+]
+
+dependencies = [
+    "flask>=3.0.0",
+    "werkzeug>=3.0.1",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+    "groq>=0.33.0",
+    "reportlab>=4.0.7",
+    "beautifulsoup4>=4.12.2",
+    "lxml>=4.9.3",
+    "Pillow>=9.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "flake8>=6.0.0",
+    "black>=23.0.0",
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/readycorpuschristi"
+Documentation = "https://github.com/yourusername/readycorpuschristi/blob/master/README.md"
+Repository = "https://github.com/yourusername/readycorpuschristi"
+Issues = "https://github.com/yourusername/readycorpuschristi/issues"
+
+[tool.black]
+line-length = 100
+target-version = ['py312']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
