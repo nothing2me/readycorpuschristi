@@ -1,5 +1,5 @@
 """
-Vercel Python handler - minimal export
+Vercel Python handler - WSGI function wrapper to bypass class inspection bug
 """
 
 import sys
@@ -13,6 +13,12 @@ try:
 except:
     pass
 
-from app import app
+from app import app as flask_app
 
-handler = app
+# Create a plain WSGI function - Vercel should accept this
+def handler(environ, start_response):
+    """
+    WSGI handler function that delegates to Flask app.
+    This is a plain function, not a class, so Vercel's issubclass check won't fail.
+    """
+    return flask_app(environ, start_response)
