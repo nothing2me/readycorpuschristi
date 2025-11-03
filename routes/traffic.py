@@ -7,7 +7,16 @@ from flask import Blueprint, request, jsonify
 from services.traffic_service import TrafficService
 
 traffic_bp = Blueprint('traffic', __name__)
-traffic_service = TrafficService()
+
+# Lazy initialization for services (avoids initialization during import in serverless environments)
+_traffic_service = None
+
+def get_traffic_service():
+    """Get or create traffic service (lazy initialization)"""
+    global _traffic_service
+    if _traffic_service is None:
+        _traffic_service = TrafficService()
+    return _traffic_service
 
 @traffic_bp.route('/congestion', methods=['POST'])
 def get_traffic_congestion():
@@ -36,6 +45,9 @@ def get_traffic_congestion():
         
         if lat is None or lng is None:
             return jsonify({'error': 'Location must have lat and lng'}), 400
+        
+        # Get service (lazy initialization)
+        traffic_service = get_traffic_service()
         
         # Get traffic data from OpenStreetMap
         traffic_points = traffic_service.get_traffic_data(lat, lng, radius_km)
@@ -77,6 +89,9 @@ def get_construction_data():
         
         if lat is None or lng is None:
             return jsonify({'error': 'Location must have lat and lng'}), 400
+        
+        # Get service (lazy initialization)
+        traffic_service = get_traffic_service()
         
         # Get construction data from OpenStreetMap
         construction_points = traffic_service.get_construction_data(lat, lng, radius_km)

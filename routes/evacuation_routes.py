@@ -7,7 +7,16 @@ from flask import Blueprint, jsonify
 from services.evacuation_routes_service import EvacuationRoutesService
 
 evacuation_routes_bp = Blueprint('evacuation_routes', __name__)
-evacuation_service = EvacuationRoutesService()
+
+# Lazy initialization for services (avoids initialization during import in serverless environments)
+_evacuation_service = None
+
+def get_evacuation_service():
+    """Get or create evacuation routes service (lazy initialization)"""
+    global _evacuation_service
+    if _evacuation_service is None:
+        _evacuation_service = EvacuationRoutesService()
+    return _evacuation_service
 
 @evacuation_routes_bp.route('/all', methods=['GET'])
 def get_all_evacuation_routes():
@@ -18,6 +27,8 @@ def get_all_evacuation_routes():
         JSON with evacuation routes using actual OSM data
     """
     try:
+        evacuation_service = get_evacuation_service()
+        
         routes = evacuation_service.get_all_evacuation_routes()
         
         return jsonify({

@@ -9,7 +9,16 @@ from pathlib import Path
 from services.camera_service import CameraService
 
 cameras_bp = Blueprint('cameras', __name__)
-camera_service = CameraService()
+
+# Lazy initialization for services (avoids file writes during import in serverless environments)
+_camera_service = None
+
+def get_camera_service():
+    """Get or create camera service (lazy initialization)"""
+    global _camera_service
+    if _camera_service is None:
+        _camera_service = CameraService()
+    return _camera_service
 
 # Get the correct path to camera_snapshots directory (in project root)
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -23,6 +32,8 @@ def get_all_cameras():
     Returns list of cameras with location and image data
     """
     try:
+        camera_service = get_camera_service()
+        
         cameras = camera_service.get_all_cameras()
         
         return jsonify({
@@ -42,6 +53,8 @@ def get_all_cameras():
 def get_camera(camera_id):
     """Get a specific camera by ID"""
     try:
+        camera_service = get_camera_service()
+        
         camera = camera_service.get_camera_by_id(camera_id)
         
         if not camera:
@@ -84,6 +97,8 @@ def create_camera():
         if lat is None or lng is None:
             return jsonify({'error': 'Latitude and longitude are required'}), 400
         
+        camera_service = get_camera_service()
+        
         camera = camera_service.add_camera(name, float(lat), float(lng))
         
         return jsonify({
@@ -117,6 +132,8 @@ def update_camera_location(camera_id):
         lng = data.get('lng')
         name = data.get('name')
         
+        camera_service = get_camera_service()
+        
         camera = camera_service.update_camera_location(camera_id, lat, lng, name)
         
         if not camera:
@@ -135,6 +152,8 @@ def update_camera_location(camera_id):
 def delete_camera(camera_id):
     """Delete a camera by ID"""
     try:
+        camera_service = get_camera_service()
+        
         deleted = camera_service.delete_camera(camera_id)
         
         if not deleted:

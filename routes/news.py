@@ -7,8 +7,15 @@ from services.news_service import NewsService
 
 news_bp = Blueprint('news', __name__)
 
-# Initialize news service
-news_service = NewsService()
+# Lazy initialization for services (avoids initialization during import in serverless environments)
+_news_service = None
+
+def get_news_service():
+    """Get or create news service (lazy initialization)"""
+    global _news_service
+    if _news_service is None:
+        _news_service = NewsService()
+    return _news_service
 
 @news_bp.route('/local', methods=['GET'])
 def get_local_news():
@@ -22,6 +29,9 @@ def get_local_news():
     try:
         query = request.args.get('query', 'Corpus Christi')
         max_results = int(request.args.get('max', 10))
+        
+        # Get service (lazy initialization)
+        news_service = get_news_service()
         
         # Get news articles
         articles = news_service.get_local_news(query=query, max_results=max_results)

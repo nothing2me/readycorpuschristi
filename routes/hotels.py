@@ -7,8 +7,15 @@ from services.hotel_service import HotelService
 
 hotels_bp = Blueprint('hotels', __name__)
 
-# Initialize hotel service
-hotel_service = HotelService()
+# Lazy initialization for services (avoids initialization during import in serverless environments)
+_hotel_service = None
+
+def get_hotel_service():
+    """Get or create hotel service (lazy initialization)"""
+    global _hotel_service
+    if _hotel_service is None:
+        _hotel_service = HotelService()
+    return _hotel_service
 
 @hotels_bp.route('/search', methods=['GET', 'POST'])
 def search_hotels():
@@ -30,6 +37,9 @@ def search_hotels():
             'sort': data.get('sort', 'price_low_high'),
             'distance_sort': data.get('distance_sort', 'closest_furthest')
         }
+        
+        # Get service (lazy initialization)
+        hotel_service = get_hotel_service()
         
         # Get hotels - SIMPLIFIED, FAST
         results = hotel_service.search_texas_hotels()

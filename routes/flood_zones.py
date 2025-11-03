@@ -9,16 +9,24 @@ from services.flood_zone_service import FloodZoneService
 
 flood_zones_bp = Blueprint('flood_zones', __name__)
 
-# Get the correct path to flood_zones.json (in project root)
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-flood_zones_file = os.path.join(project_root, 'flood_zones.json')
+# Lazy initialization for services (avoids file writes during import in serverless environments)
+_flood_zone_service = None
 
-flood_zone_service = FloodZoneService(db_file=flood_zones_file)
+def get_flood_zone_service():
+    """Get or create flood zone service (lazy initialization)"""
+    global _flood_zone_service
+    if _flood_zone_service is None:
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        flood_zones_file = os.path.join(project_root, 'flood_zones.json')
+        _flood_zone_service = FloodZoneService(db_file=flood_zones_file)
+    return _flood_zone_service
 
 @flood_zones_bp.route('/all', methods=['GET'])
 def get_all_zones():
     """Get all flood zones"""
     try:
+        flood_zone_service = get_flood_zone_service()
+        
         zones = flood_zone_service.get_all_zones()
         return jsonify({
             'status': 'success',
@@ -75,6 +83,9 @@ def create_zone():
             'rotation': rotation
         }
         
+        # Get service (lazy initialization)
+        flood_zone_service = get_flood_zone_service()
+        
         # Save zone
         created_zone = flood_zone_service.create_zone(zone_data)
         
@@ -106,6 +117,9 @@ def update_zone(zone_id):
         if not data:
             return jsonify({'error': 'Request data is required'}), 400
         
+        # Get service (lazy initialization)
+        flood_zone_service = get_flood_zone_service()
+        
         # Update zone
         updated = flood_zone_service.update_zone(zone_id, data)
         
@@ -127,6 +141,8 @@ def update_zone(zone_id):
 def get_zone(zone_id):
     """Get a specific zone by ID"""
     try:
+        flood_zone_service = get_flood_zone_service()
+        
         zone = flood_zone_service.get_zone_by_id(zone_id)
         
         if not zone:
@@ -145,6 +161,8 @@ def get_zone(zone_id):
 def delete_zone(zone_id):
     """Delete a zone by ID"""
     try:
+        flood_zone_service = get_flood_zone_service()
+        
         deleted = flood_zone_service.delete_zone(zone_id)
         
         if not deleted:

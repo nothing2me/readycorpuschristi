@@ -8,8 +8,15 @@ from services.map_service import MapService
 
 map_data_bp = Blueprint('map_data', __name__)
 
-# Initialize map service
-map_service = MapService()
+# Lazy initialization for services (avoids initialization during import in serverless environments)
+_map_service = None
+
+def get_map_service():
+    """Get or create map service (lazy initialization)"""
+    global _map_service
+    if _map_service is None:
+        _map_service = MapService()
+    return _map_service
 
 @map_data_bp.route('/geocode', methods=['POST'])
 def geocode_address():
@@ -28,6 +35,9 @@ def geocode_address():
             return jsonify({'error': 'Address is required'}), 400
         
         address = data.get('address')
+        
+        # Get service (lazy initialization)
+        map_service = get_map_service()
         
         # Get geocoded data from map service
         result = map_service.geocode_address(address)
@@ -59,6 +69,9 @@ def reverse_geocode():
         
         lat = float(data.get('lat'))
         lng = float(data.get('lng'))
+        
+        # Get service (lazy initialization)
+        map_service = get_map_service()
         
         # Get reverse geocoded data
         result = map_service.reverse_geocode(lat, lng)

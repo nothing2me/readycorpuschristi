@@ -7,8 +7,15 @@ from services.weather_service import WeatherService
 
 weather_bp = Blueprint('weather', __name__)
 
-# Initialize weather service
-weather_service = WeatherService()
+# Lazy initialization for services (avoids initialization during import in serverless environments)
+_weather_service = None
+
+def get_weather_service():
+    """Get or create weather service (lazy initialization)"""
+    global _weather_service
+    if _weather_service is None:
+        _weather_service = WeatherService()
+    return _weather_service
 
 @weather_bp.route('/forecast', methods=['POST'])
 def get_forecast():
@@ -36,6 +43,9 @@ def get_forecast():
         
         lat = float(location.get('lat'))
         lng = float(location.get('lng'))
+        
+        # Get service (lazy initialization)
+        weather_service = get_weather_service()
         
         # Get weather forecast
         weather_data = weather_service.get_forecast(lat, lng)

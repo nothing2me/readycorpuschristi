@@ -11,9 +11,32 @@ from datetime import datetime, timedelta
 import os
 
 admin_bp = Blueprint('admin', __name__)
-warning_service = WarningService()
-chatbot_service = ChatbotService()
-admin_log_service = AdminLogService()
+
+# Lazy initialization for services (avoids file writes during import in serverless environments)
+_warning_service = None
+_chatbot_service = None
+_admin_log_service = None
+
+def get_warning_service():
+    """Get or create warning service (lazy initialization)"""
+    global _warning_service
+    if _warning_service is None:
+        _warning_service = WarningService()
+    return _warning_service
+
+def get_chatbot_service():
+    """Get or create chatbot service (lazy initialization)"""
+    global _chatbot_service
+    if _chatbot_service is None:
+        _chatbot_service = ChatbotService()
+    return _chatbot_service
+
+def get_admin_log_service():
+    """Get or create admin log service (lazy initialization)"""
+    global _admin_log_service
+    if _admin_log_service is None:
+        _admin_log_service = AdminLogService()
+    return _admin_log_service
 
 def check_admin_auth(request):
     """Simple authentication check (can be enhanced later)"""
@@ -40,6 +63,8 @@ def get_all_warnings_admin():
         return jsonify({'error': 'Unauthorized'}), 401
     
     try:
+        warning_service = get_warning_service()
+        
         include_expired = request.args.get('include_expired', 'true').lower() == 'true'
         warnings = warning_service.get_all_warnings(include_expired=include_expired)
         
@@ -81,6 +106,8 @@ def delete_warning_admin(warning_id):
         return jsonify({'error': 'Unauthorized'}), 401
     
     try:
+        warning_service = get_warning_service()
+        
         deleted = warning_service.delete_warning(warning_id)
         
         if not deleted:
@@ -102,6 +129,8 @@ def cleanup_warnings_admin():
         return jsonify({'error': 'Unauthorized'}), 401
     
     try:
+        warning_service = get_warning_service()
+        
         removed_count = warning_service.cleanup_expired()
         
         return jsonify({
@@ -126,6 +155,10 @@ def system_health():
             'timestamp': datetime.now().isoformat(),
             'services': {}
         }
+        
+        # Get services (lazy initialization)
+        warning_service = get_warning_service()
+        chatbot_service = get_chatbot_service()
         
         # Check warning service
         try:
@@ -183,6 +216,8 @@ def warning_stats():
         return jsonify({'error': 'Unauthorized'}), 401
     
     try:
+        warning_service = get_warning_service()
+        
         warnings = warning_service.get_all_warnings(include_expired=True)
         
         now = datetime.now()
@@ -270,6 +305,8 @@ def get_chatbot_logs():
         end_date = request.args.get('end_date')
         limit = int(request.args.get('limit', 100))
         
+        admin_log_service = get_admin_log_service()
+        
         interactions = admin_log_service.search_interactions(
             query=query,
             ip_address=ip_address,
@@ -296,6 +333,8 @@ def get_ip_logs(ip_address):
         return jsonify({'error': 'Unauthorized'}), 401
     
     try:
+        admin_log_service = get_admin_log_service()
+        
         limit = int(request.args.get('limit', 100))
         interactions = admin_log_service.get_ip_interactions(ip_address, limit=limit)
         stats = admin_log_service.get_ip_stats(ip_address)
@@ -319,6 +358,8 @@ def get_chatbot_log_stats():
         return jsonify({'error': 'Unauthorized'}), 401
     
     try:
+        admin_log_service = get_admin_log_service()
+        
         all_stats = admin_log_service.get_all_stats()
         
         # Calculate aggregate stats

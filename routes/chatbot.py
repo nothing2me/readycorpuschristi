@@ -16,24 +16,63 @@ from services.traffic_service import TrafficService
 
 chatbot_bp = Blueprint('chatbot', __name__)
 
-# Initialize chatbot service
-chatbot_service = ChatbotService()
+# Lazy initialization for services (avoids file writes during import in serverless environments)
+_chatbot_service = None
+_safety_template = None
+_pdf_generator = None
+_conversation_history_service = None
+_admin_log_service = None
+_weather_service = None
+_traffic_service = None
 
-# Initialize safety evaluation template
-safety_template = SafetyEvaluationTemplate()
+def get_chatbot_service():
+    """Get or create chatbot service (lazy initialization)"""
+    global _chatbot_service
+    if _chatbot_service is None:
+        _chatbot_service = ChatbotService()
+    return _chatbot_service
 
-# Initialize PDF generator
-pdf_generator = PDFGenerator()
+def get_safety_template():
+    """Get or create safety evaluation template (lazy initialization)"""
+    global _safety_template
+    if _safety_template is None:
+        _safety_template = SafetyEvaluationTemplate()
+    return _safety_template
 
-# Initialize conversation history service
-conversation_history_service = ConversationHistoryService()
+def get_pdf_generator():
+    """Get or create PDF generator (lazy initialization)"""
+    global _pdf_generator
+    if _pdf_generator is None:
+        _pdf_generator = PDFGenerator()
+    return _pdf_generator
 
-# Initialize admin log service
-admin_log_service = AdminLogService()
+def get_conversation_history_service():
+    """Get or create conversation history service (lazy initialization)"""
+    global _conversation_history_service
+    if _conversation_history_service is None:
+        _conversation_history_service = ConversationHistoryService()
+    return _conversation_history_service
 
-# Initialize weather and traffic services
-weather_service = WeatherService()
-traffic_service = TrafficService()
+def get_admin_log_service():
+    """Get or create admin log service (lazy initialization)"""
+    global _admin_log_service
+    if _admin_log_service is None:
+        _admin_log_service = AdminLogService()
+    return _admin_log_service
+
+def get_weather_service():
+    """Get or create weather service (lazy initialization)"""
+    global _weather_service
+    if _weather_service is None:
+        _weather_service = WeatherService()
+    return _weather_service
+
+def get_traffic_service():
+    """Get or create traffic service (lazy initialization)"""
+    global _traffic_service
+    if _traffic_service is None:
+        _traffic_service = TrafficService()
+    return _traffic_service
 
 # Corpus Christi center coordinates for weather/traffic data
 CORPUS_CHRISTI_LAT = 27.8006
@@ -77,6 +116,13 @@ def send_message():
         
         # Get client IP address
         client_ip = get_client_ip()
+        
+        # Get services (lazy initialization)
+        weather_service = get_weather_service()
+        traffic_service = get_traffic_service()
+        conversation_history_service = get_conversation_history_service()
+        chatbot_service = get_chatbot_service()
+        admin_log_service = get_admin_log_service()
         
         # Fetch current weather and traffic conditions for Corpus Christi
         try:
@@ -220,6 +266,12 @@ def safety_evaluation():
                 normalized_answers[int(key)] = value
             evaluation_data['answers'] = normalized_answers
         
+        # Get services (lazy initialization)
+        safety_template = get_safety_template()
+        conversation_history_service = get_conversation_history_service()
+        chatbot_service = get_chatbot_service()
+        admin_log_service = get_admin_log_service()
+        
         # Generate the safety evaluation prompt using template
         prompt = safety_template.generate_prompt(evaluation_data)
         
@@ -330,6 +382,9 @@ def download_pdf():
         
         if not evaluation_response:
             return jsonify({'error': 'Evaluation response is required'}), 400
+        
+        # Get services (lazy initialization)
+        pdf_generator = get_pdf_generator()
         
         # Generate PDF
         pdf_buffer = pdf_generator.generate_safety_evaluation_pdf(

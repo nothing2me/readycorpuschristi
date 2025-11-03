@@ -9,11 +9,17 @@ from services.warning_service import WarningService
 
 warnings_bp = Blueprint('warnings', __name__)
 
-# Get the correct path to warnings.json (in project root)
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-warnings_file = os.path.join(project_root, 'warnings.json')
+# Lazy initialization for services (avoids file writes during import in serverless environments)
+_warning_service = None
 
-warning_service = WarningService(db_file=warnings_file)
+def get_warning_service():
+    """Get or create warning service (lazy initialization)"""
+    global _warning_service
+    if _warning_service is None:
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        warnings_file = os.path.join(project_root, 'warnings.json')
+        _warning_service = WarningService(db_file=warnings_file)
+    return _warning_service
 
 @warnings_bp.route('/create', methods=['POST'])
 def create_warning():
@@ -65,6 +71,9 @@ def create_warning():
         if expiry_time:
             warning_data['expiry_time'] = expiry_time
         
+        # Get service (lazy initialization)
+        warning_service = get_warning_service()
+        
         # Save warning
         created_warning = warning_service.create_warning(warning_data)
         
@@ -86,6 +95,8 @@ def get_all_warnings():
     - include_expired: true/false (default false)
     """
     try:
+        warning_service = get_warning_service()
+        
         include_expired = request.args.get('include_expired', 'false').lower() == 'true'
         
         warnings = warning_service.get_all_warnings(include_expired=include_expired)
@@ -128,6 +139,8 @@ def get_nearby_warnings():
         if lat is None or lng is None:
             return jsonify({'error': 'Location must have lat and lng'}), 400
         
+        warning_service = get_warning_service()
+        
         warnings = warning_service.get_warnings_in_area(lat, lng, radius_km)
         
         return jsonify({
@@ -144,6 +157,8 @@ def get_nearby_warnings():
 def get_warning(warning_id):
     """Get a specific warning by ID"""
     try:
+        warning_service = get_warning_service()
+        
         warning = warning_service.get_warning_by_id(warning_id)
         
         if not warning:
@@ -162,6 +177,8 @@ def get_warning(warning_id):
 def delete_warning(warning_id):
     """Delete a warning by ID"""
     try:
+        warning_service = get_warning_service()
+        
         deleted = warning_service.delete_warning(warning_id)
         
         if not deleted:
@@ -180,6 +197,8 @@ def delete_warning(warning_id):
 def cleanup_expired():
     """Remove all expired warnings from the database"""
     try:
+        warning_service = get_warning_service()
+        
         removed_count = warning_service.cleanup_expired()
         
         return jsonify({
