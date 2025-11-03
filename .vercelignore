@@ -20,12 +20,13 @@ conversation_history.json
 warnings.json
 flood_zones.json
 cameras_data.json
-requirements-dev.txt
 .env
 .env.local
 .venv/
 venv/
 ENV/
+# Ignore pyproject.toml to prevent editable package installation issues
+pyproject.toml
 # Note: camera_snapshots and mapzone directories are INCLUDED for deployment
 # Note: static and templates directories are INCLUDED for deployment
 
