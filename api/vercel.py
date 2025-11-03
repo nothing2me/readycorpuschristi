@@ -1,19 +1,23 @@
 """
-Vercel Python handler - Flask WSGI app
+Vercel Python handler - import Flask app from app.py
 """
 
-from flask import Flask, jsonify
+import sys
+import os
 
-app = Flask(__name__)
+# Add project root to path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def catch_all(path):
-    return jsonify({
-        'status': 'working',
-        'path': path,
-        'message': 'Flask app is running'
-    })
+# Change to project root
+try:
+    os.chdir(project_root)
+except:
+    pass
 
-# Export Flask WSGI app - Vercel expects this to be named 'handler'
+# Import Flask app
+from app import app
+
+# Export as handler - Vercel expects this name
 handler = app
