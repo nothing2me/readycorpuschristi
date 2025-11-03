@@ -52,29 +52,30 @@ def serve_mapzone(filename):
     return send_from_directory(mapzone_dir, filename)
 
 # Register blueprints for modular architecture
-from routes.chatbot import chatbot_bp
-from routes.map_data import map_data_bp
-from routes.weather import weather_bp
-from routes.news import news_bp
-from routes.warnings import warnings_bp
-from routes.admin import admin_bp
-from routes.flood_zones import flood_zones_bp
-from routes.traffic import traffic_bp
-from routes.hotels import hotels_bp
-from routes.cameras import cameras_bp
-from routes.evacuation_routes import evacuation_routes_bp
+# Wrap each import in try/except to prevent one failing route from crashing the entire app
+blueprints = [
+    ('routes.chatbot', 'chatbot_bp', '/api/chatbot'),
+    ('routes.map_data', 'map_data_bp', '/api/map'),
+    ('routes.weather', 'weather_bp', '/api/weather'),
+    ('routes.news', 'news_bp', '/api/news'),
+    ('routes.warnings', 'warnings_bp', '/api/warnings'),
+    ('routes.admin', 'admin_bp', '/api/admin'),
+    ('routes.flood_zones', 'flood_zones_bp', '/api/flood-zones'),
+    ('routes.traffic', 'traffic_bp', '/api/traffic'),
+    ('routes.hotels', 'hotels_bp', '/api/hotels'),
+    ('routes.cameras', 'cameras_bp', '/api/cameras'),
+    ('routes.evacuation_routes', 'evacuation_routes_bp', '/api/evacuation-routes'),
+]
 
-app.register_blueprint(chatbot_bp, url_prefix='/api/chatbot')
-app.register_blueprint(map_data_bp, url_prefix='/api/map')
-app.register_blueprint(weather_bp, url_prefix='/api/weather')
-app.register_blueprint(news_bp, url_prefix='/api/news')
-app.register_blueprint(warnings_bp, url_prefix='/api/warnings')
-app.register_blueprint(admin_bp, url_prefix='/api/admin')
-app.register_blueprint(flood_zones_bp, url_prefix='/api/flood-zones')
-app.register_blueprint(traffic_bp, url_prefix='/api/traffic')
-app.register_blueprint(hotels_bp, url_prefix='/api/hotels')
-app.register_blueprint(cameras_bp, url_prefix='/api/cameras')
-app.register_blueprint(evacuation_routes_bp, url_prefix='/api/evacuation-routes')
+for module_name, bp_name, url_prefix in blueprints:
+    try:
+        module = __import__(module_name, fromlist=[bp_name])
+        blueprint = getattr(module, bp_name)
+        app.register_blueprint(blueprint, url_prefix=url_prefix)
+        print(f"✓ Registered blueprint: {url_prefix}")
+    except Exception as e:
+        print(f"⚠ Warning: Failed to register {url_prefix}: {type(e).__name__}: {e}")
+        # Continue with other blueprints - don't crash the entire app
 
 @app.route('/')
 def index():
