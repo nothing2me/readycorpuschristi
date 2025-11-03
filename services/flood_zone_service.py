@@ -10,14 +10,22 @@ from typing import List, Dict, Any, Optional
 class FloodZoneService:
     def __init__(self, db_file: str = 'flood_zones.json'):
         self.db_file = db_file
+        self._in_memory = False
+        self._memory_storage = []  # Fallback in-memory storage
         self._ensure_db_file()
         self._initialize_default_zones_if_empty()
     
     def _ensure_db_file(self):
         """Create the JSON database file if it doesn't exist"""
-        if not os.path.exists(self.db_file):
-            with open(self.db_file, 'w') as f:
-                json.dump([], f)
+        try:
+            if not os.path.exists(self.db_file):
+                with open(self.db_file, 'w') as f:
+                    json.dump([], f)
+        except (IOError, PermissionError, OSError) as e:
+            # In serverless environments (like Vercel), file writes may not be allowed
+            # This is okay - we'll work with in-memory data instead
+            print(f"Warning: Could not create {self.db_file}: {e}. Using in-memory storage.")
+            self._in_memory = True
     
     def _initialize_default_zones_if_empty(self):
         """Initialize default flood zones if the database is empty"""
@@ -85,17 +93,28 @@ class FloodZoneService:
     
     def _load_zones(self) -> List[Dict[str, Any]]:
         """Load all flood zones from JSON file"""
+        if self._in_memory:
+            return self._memory_storage
         try:
             with open(self.db_file, 'r') as f:
                 zones = json.load(f)
                 return zones if isinstance(zones, list) else []
-        except (json.JSONDecodeError, FileNotFoundError):
+        except (json.JSONDecodeError, FileNotFoundError, IOError, PermissionError):
             return []
     
     def _save_zones(self, zones: List[Dict[str, Any]]):
         """Save flood zones to JSON file"""
-        with open(self.db_file, 'w') as f:
-            json.dump(zones, f, indent=2)
+        if self._in_memory:
+            self._memory_storage = zones
+            return
+        try:
+            with open(self.db_file, 'w') as f:
+                json.dump(zones, f, indent=2)
+        except (IOError, PermissionError, OSError) as e:
+            # In serverless environments, file writes may fail - use in-memory storage
+            print(f"Warning: Could not save to {self.db_file}: {e}. Using in-memory storage.")
+            self._in_memory = True
+            self._memory_storage = zones
     
     def create_zone(self, zone_data: Dict[str, Any]) -> Dict[str, Any]:
         """

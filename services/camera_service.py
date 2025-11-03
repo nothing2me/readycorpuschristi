@@ -27,163 +27,182 @@ class CameraService:
             project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             data_file = os.path.join(project_root, 'cameras_data.json')
         self.data_file = Path(data_file)
+        self._in_memory = False
+        self._memory_storage = {'cameras': []}  # Fallback in-memory storage
         self._ensure_data_file()
         
     def _ensure_data_file(self):
         """Create the data file with default dummy cameras if it doesn't exist"""
         import os
-        if not self.data_file.exists():
-            # Get available placeholder images from camera_snapshots directory
-            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            snapshot_dir = Path(project_root) / 'camera_snapshots'
-            placeholder_images = []
-            
-            # Look for the three images: CRP-SH358.jpg, sh286@hawthorne.jpg, sh358@ayers.jpg
-            available_images = [
-                'CRP-SH358.jpg',
-                'sh286@hawthorne.jpg',
-                'sh358@ayers.jpg'
-            ]
-            
-            # Check which images actually exist
-            for img_name in available_images:
-                img_path = snapshot_dir / img_name
-                if img_path.exists():
-                    placeholder_images.append(f'/api/cameras/image/{img_name}')
-            
-            # Default Corpus Christi camera locations with placeholder images
-            default_cameras = [
-                {
-                    'id': 1,
-                    'location': {
-                        'name': 'IH-37 at SH-359',
-                        'lat': 27.7564,
-                        'lng': -97.4042
+        try:
+            if not self.data_file.exists():
+                # Get available placeholder images from camera_snapshots directory
+                project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                snapshot_dir = Path(project_root) / 'camera_snapshots'
+                placeholder_images = []
+                
+                # Look for the three images: CRP-SH358.jpg, sh286@hawthorne.jpg, sh358@ayers.jpg
+                available_images = [
+                    'CRP-SH358.jpg',
+                    'sh286@hawthorne.jpg',
+                    'sh358@ayers.jpg'
+                ]
+                
+                # Check which images actually exist
+                for img_name in available_images:
+                    img_path = snapshot_dir / img_name
+                    if img_path.exists():
+                        placeholder_images.append(f'/api/cameras/image/{img_name}')
+                
+                # Default Corpus Christi camera locations with placeholder images
+                default_cameras = [
+                    {
+                        'id': 1,
+                        'location': {
+                            'name': 'IH-37 at SH-359',
+                            'lat': 27.7564,
+                            'lng': -97.4042
+                        },
+                        'image_path': placeholder_images[0] if len(placeholder_images) > 0 else '/static/images/camera-placeholder.jpg',
+                        'timestamp': datetime.now().isoformat()
                     },
-                    'image_path': placeholder_images[0] if len(placeholder_images) > 0 else '/static/images/camera-placeholder.jpg',
-                    'timestamp': datetime.now().isoformat()
-                },
-                {
-                    'id': 2,
-                    'location': {
-                        'name': 'IH-37 at Weber Road',
-                        'lat': 27.7834,
-                        'lng': -97.4132
+                    {
+                        'id': 2,
+                        'location': {
+                            'name': 'IH-37 at Weber Road',
+                            'lat': 27.7834,
+                            'lng': -97.4132
+                        },
+                        'image_path': placeholder_images[1] if len(placeholder_images) > 1 else '/static/images/camera-placeholder.jpg',
+                        'timestamp': datetime.now().isoformat()
                     },
-                    'image_path': placeholder_images[1] if len(placeholder_images) > 1 else '/static/images/camera-placeholder.jpg',
-                    'timestamp': datetime.now().isoformat()
-                },
-                {
-                    'id': 3,
-                    'location': {
-                        'name': 'IH-37 at SPID',
-                        'lat': 27.7225,
-                        'lng': -97.3956
+                    {
+                        'id': 3,
+                        'location': {
+                            'name': 'IH-37 at SPID',
+                            'lat': 27.7225,
+                            'lng': -97.3956
+                        },
+                        'image_path': placeholder_images[2] if len(placeholder_images) > 2 else '/static/images/camera-placeholder.jpg',
+                        'timestamp': datetime.now().isoformat()
                     },
-                    'image_path': placeholder_images[2] if len(placeholder_images) > 2 else '/static/images/camera-placeholder.jpg',
-                    'timestamp': datetime.now().isoformat()
-                },
-                {
-                    'id': 4,
-                    'location': {
-                        'name': 'IH-37 at Ayers Street',
-                        'lat': 27.7912,
-                        'lng': -97.4215
+                    {
+                        'id': 4,
+                        'location': {
+                            'name': 'IH-37 at Ayers Street',
+                            'lat': 27.7912,
+                            'lng': -97.4215
+                        },
+                        'image_path': placeholder_images[0] if len(placeholder_images) > 0 else '/static/images/camera-placeholder.jpg',
+                        'timestamp': datetime.now().isoformat()
                     },
-                    'image_path': placeholder_images[0] if len(placeholder_images) > 0 else '/static/images/camera-placeholder.jpg',
-                    'timestamp': datetime.now().isoformat()
-                },
-                {
-                    'id': 5,
-                    'location': {
-                        'name': 'US-181 at SH-361',
-                        'lat': 27.7134,
-                        'lng': -97.3718
+                    {
+                        'id': 5,
+                        'location': {
+                            'name': 'US-181 at SH-361',
+                            'lat': 27.7134,
+                            'lng': -97.3718
+                        },
+                        'image_path': placeholder_images[1] if len(placeholder_images) > 1 else '/static/images/camera-placeholder.jpg',
+                        'timestamp': datetime.now().isoformat()
                     },
-                    'image_path': placeholder_images[1] if len(placeholder_images) > 1 else '/static/images/camera-placeholder.jpg',
-                    'timestamp': datetime.now().isoformat()
-                },
-                {
-                    'id': 6,
-                    'location': {
-                        'name': 'US-181 at Port Avenue',
-                        'lat': 27.7345,
-                        'lng': -97.3829
+                    {
+                        'id': 6,
+                        'location': {
+                            'name': 'US-181 at Port Avenue',
+                            'lat': 27.7345,
+                            'lng': -97.3829
+                        },
+                        'image_path': placeholder_images[2] if len(placeholder_images) > 2 else '/static/images/camera-placeholder.jpg',
+                        'timestamp': datetime.now().isoformat()
                     },
-                    'image_path': placeholder_images[2] if len(placeholder_images) > 2 else '/static/images/camera-placeholder.jpg',
-                    'timestamp': datetime.now().isoformat()
-                },
-                {
-                    'id': 7,
-                    'location': {
-                        'name': 'SPID at Staples Street',
-                        'lat': 27.7089,
-                        'lng': -97.3934
+                    {
+                        'id': 7,
+                        'location': {
+                            'name': 'SPID at Staples Street',
+                            'lat': 27.7089,
+                            'lng': -97.3934
+                        },
+                        'image_path': placeholder_images[0] if len(placeholder_images) > 0 else '/static/images/camera-placeholder.jpg',
+                        'timestamp': datetime.now().isoformat()
                     },
-                    'image_path': placeholder_images[0] if len(placeholder_images) > 0 else '/static/images/camera-placeholder.jpg',
-                    'timestamp': datetime.now().isoformat()
-                },
-                {
-                    'id': 8,
-                    'location': {
-                        'name': 'SPID at Airline Road',
-                        'lat': 27.7167,
-                        'lng': -97.4012
-                    },
-                    'image_path': placeholder_images[1] if len(placeholder_images) > 1 else '/static/images/camera-placeholder.jpg',
-                    'timestamp': datetime.now().isoformat()
-                }
-            ]
-            
-            self._save_cameras(default_cameras)
-        else:
-            # Update existing cameras to use the placeholder images if they don't have proper image paths
-            import os
-            cameras = self._load_cameras()
-            updated = False
-            
-            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            snapshot_dir = Path(project_root) / 'camera_snapshots'
-            available_images = [
-                'CRP-SH358.jpg',
-                'sh286@hawthorne.jpg',
-                'sh358@ayers.jpg'
-            ]
-            
-            # Build image paths
-            placeholder_images = []
-            for img_name in available_images:
-                img_path = snapshot_dir / img_name
-                if img_path.exists():
-                    placeholder_images.append(f'/api/cameras/image/{img_name}')
-            
-            # Update cameras that are using old placeholder paths
-            for i, camera in enumerate(cameras):
-                old_path = camera.get('image_path', '')
-                if '/static/images/camera-placeholder.jpg' in old_path or not old_path:
-                    # Assign one of the placeholder images cyclically
-                    img_index = i % len(placeholder_images) if placeholder_images else 0
-                    camera['image_path'] = placeholder_images[img_index] if placeholder_images else '/static/images/camera-placeholder.jpg'
-                    if 'timestamp' not in camera:
-                        camera['timestamp'] = datetime.now().isoformat()
-                    updated = True
-            
-            if updated:
-                self._save_cameras(cameras)
+                    {
+                        'id': 8,
+                        'location': {
+                            'name': 'SPID at Airline Road',
+                            'lat': 27.7167,
+                            'lng': -97.4012
+                        },
+                        'image_path': placeholder_images[1] if len(placeholder_images) > 1 else '/static/images/camera-placeholder.jpg',
+                        'timestamp': datetime.now().isoformat()
+                    }
+                ]
+                
+                self._save_cameras(default_cameras)
+            else:
+                # Update existing cameras to use the placeholder images if they don't have proper image paths
+                import os
+                cameras = self._load_cameras()
+                updated = False
+                
+                project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                snapshot_dir = Path(project_root) / 'camera_snapshots'
+                available_images = [
+                    'CRP-SH358.jpg',
+                    'sh286@hawthorne.jpg',
+                    'sh358@ayers.jpg'
+                ]
+                
+                # Build image paths
+                placeholder_images = []
+                for img_name in available_images:
+                    img_path = snapshot_dir / img_name
+                    if img_path.exists():
+                        placeholder_images.append(f'/api/cameras/image/{img_name}')
+                
+                # Update cameras that are using old placeholder paths
+                for i, camera in enumerate(cameras):
+                    old_path = camera.get('image_path', '')
+                    if '/static/images/camera-placeholder.jpg' in old_path or not old_path:
+                        # Assign one of the placeholder images cyclically
+                        img_index = i % len(placeholder_images) if placeholder_images else 0
+                        camera['image_path'] = placeholder_images[img_index] if placeholder_images else '/static/images/camera-placeholder.jpg'
+                        if 'timestamp' not in camera:
+                            camera['timestamp'] = datetime.now().isoformat()
+                        updated = True
+                
+                if updated:
+                    self._save_cameras(cameras)
+        except (IOError, PermissionError, OSError) as e:
+            # In serverless environments (like Vercel), file writes may not be allowed
+            # This is okay - we'll work with in-memory data instead
+            print(f"Warning: Could not create/update {self.data_file}: {e}. Using in-memory storage.")
+            self._in_memory = True
     
     def _load_cameras(self) -> List[Dict[str, Any]]:
         """Load cameras from JSON file"""
+        if self._in_memory:
+            return self._memory_storage.get('cameras', [])
         try:
             with open(self.data_file, 'r') as f:
                 data = json.load(f)
                 return data.get('cameras', [])
-        except (json.JSONDecodeError, FileNotFoundError):
+        except (json.JSONDecodeError, FileNotFoundError, IOError, PermissionError):
             return []
     
     def _save_cameras(self, cameras: List[Dict[str, Any]]):
         """Save cameras to JSON file"""
-        with open(self.data_file, 'w') as f:
-            json.dump({'cameras': cameras}, f, indent=2)
+        if self._in_memory:
+            self._memory_storage = {'cameras': cameras}
+            return
+        try:
+            with open(self.data_file, 'w') as f:
+                json.dump({'cameras': cameras}, f, indent=2)
+        except (IOError, PermissionError, OSError) as e:
+            # In serverless environments, file writes may fail - use in-memory storage
+            print(f"Warning: Could not save to {self.data_file}: {e}. Using in-memory storage.")
+            self._in_memory = True
+            self._memory_storage = {'cameras': cameras}
     
     def get_all_cameras(self) -> List[Dict[str, Any]]:
         """Get all cameras with coordinates"""
