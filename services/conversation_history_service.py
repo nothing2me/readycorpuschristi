@@ -11,7 +11,18 @@ from typing import List, Dict, Any, Optional
 class ConversationHistoryService:
     """Service for managing conversation history in JSON format"""
     
-    def __init__(self, db_file: str = 'conversation_history.json'):
+    def __init__(self, db_file: str = None):
+        # Detect serverless environment and use /tmp if needed
+        is_serverless = os.getenv('VERCEL') or os.getenv('LAMBDA_TASK_ROOT') or os.getenv('SERVERLESS')
+        
+        if db_file is None:
+            if is_serverless:
+                # Use /tmp for serverless environments
+                db_file = '/tmp/conversation_history.json'
+            else:
+                # Use root directory for local development
+                db_file = 'conversation_history.json'
+        
         self.db_file = db_file
         self._in_memory = False
         self._memory_storage = {}  # Fallback in-memory storage

@@ -14,12 +14,22 @@ class AdminLogService:
     """Service for logging all user-chatbot interactions with IP addresses"""
     
     def __init__(self, log_file: str = None):
-        # Create logs directory if it doesn't exist
-        self.logs_dir = Path('logs')
+        # Detect if we're in a serverless environment (Vercel, AWS Lambda, etc.)
+        # Check if /tmp is available (typical for serverless) or if we're in read-only filesystem
+        is_serverless = os.getenv('VERCEL') or os.getenv('LAMBDA_TASK_ROOT') or os.getenv('SERVERLESS')
+        
+        if is_serverless:
+            # Use /tmp for logs in serverless environments (only writable location)
+            self.logs_dir = Path('/tmp/logs')
+            print("Serverless environment detected, using /tmp/logs for logs")
+        else:
+            # Use logs directory in project root for local development
+            self.logs_dir = Path('logs')
+        
         self._in_memory = False
         self._memory_storage = {}  # Fallback in-memory storage
         try:
-            self.logs_dir.mkdir(exist_ok=True)
+            self.logs_dir.mkdir(parents=True, exist_ok=True)
         except (IOError, PermissionError, OSError) as e:
             print(f"Warning: Could not create logs directory: {e}. Using in-memory storage.")
             self._in_memory = True
@@ -48,7 +58,12 @@ class AdminLogService:
     def _ensure_log_file(self):
         """Create the admin log file if it doesn't exist"""
         # Ensure logs directory exists
-        self.logs_dir.mkdir(exist_ok=True)
+        try:
+            self.logs_dir.mkdir(parents=True, exist_ok=True)
+        except (IOError, PermissionError, OSError) as e:
+            print(f"Warning: Could not create logs directory: {e}. Using in-memory storage.")
+            self._in_memory = True
+            return
         
         # Check if there's an old admin_log.json in the root directory and move it
         old_log_path = Path('admin_log.json')
@@ -97,9 +112,13 @@ class AdminLogService:
         try:
             # Ensure logs directory exists
             try:
-                self.logs_dir.mkdir(exist_ok=True)
-            except (IOError, PermissionError, OSError):
-                pass  # Directory might already exist or can't be created
+                self.logs_dir.mkdir(parents=True, exist_ok=True)
+            except (IOError, PermissionError, OSError) as e:
+                # If we can't create directory, switch to in-memory storage
+                print(f"Warning: Could not create logs directory: {e}. Switching to in-memory storage.")
+                self._in_memory = True
+                self._memory_storage = log
+                return
             
             # Create backup of existing log before writing
             if os.path.exists(self.log_file):
@@ -200,15 +219,33 @@ class AdminLogService:
                 log[ip_address]['total_interactions'] = len(log[ip_address]['interactions'])
             
             self._save_log(log)
-            # Debug: Print confirmation that log was saved
-            print(f"[Admin Log] Saved interaction to {self.log_file} - IP: {ip_address}, Type: {interaction_type}")
+            # Debug: Print confirmation that log was saved (only if not in-memory)
+            if not self._in_memory:
+                print(f"[Admin Log] Saved interaction to {self.log_file} - IP: {ip_address}, Type: {interaction_type}")
+            else:
+                print(f"[Admin Log] Saved interaction to in-memory storage - IP: {ip_address}, Type: {interaction_type}")
         except Exception as e:
-            # Log errors to console but don't raise exception
+            # Log errors to console but don't raise exception - silently fail and use in-memory
             print(f"Error in admin_log_service.log_interaction: {e}")
-            import traceback
-            traceback.print_exc()
-            # Re-raise to let calling code handle if needed
-            raise
+            print("Falling back to in-memory storage.")
+            # Don't raise - just use in-memory storage silently
+            self._in_memory = True
+            # Try to save to in-memory storage as fallback
+            try:
+                if ip_address not in self._memory_storage:
+                    self._memory_storage[ip_address] = {'interactions': []}
+                interaction = {
+                    'timestamp': datetime.now().isoformat(),
+                    'user_message': str(user_message)[:10000],
+                    'assistant_response': str(assistant_response)[:10000],
+                    'interaction_type': str(interaction_type),
+                    'session_id': str(session_id) if session_id else 'unknown'
+                }
+                if metadata:
+                    interaction['metadata'] = metadata
+                self._memory_storage[ip_address]['interactions'].append(interaction)
+            except Exception:
+                pass  # Even in-memory save failed, just give up silently
     
     def get_ip_interactions(self, ip_address: str, limit: Optional[int] = None) -> List[Dict[str, Any]]:
         """
