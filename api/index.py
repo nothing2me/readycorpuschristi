@@ -1,5 +1,7 @@
 """
-Vercel Python handler - Minimal working example
+Vercel Python handler - Alternative entry point
+This file can be used if deploying via api/index.py pattern
+Main deployment uses app.py directly as specified in vercel.json
 """
 
 import sys
