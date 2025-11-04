@@ -322,8 +322,8 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 
 **3++ Team - Islander Hackathon 2025**
 
-- **Noah Wilborn** - Backend Developer
-- **Mihail Stegall** - Frontend Developer
+- **Noah Wilborn** - Fullstack Developer
+- **Mihail Stegall** - Fullstack Developer
 - **Grace Williams** - Requirements and Specifications
 - **Voss Purkey** - Presenter and Tester
 
